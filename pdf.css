@@ -1,0 +1,71 @@
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  padding: 20px 40px;
+}
+
+h1 {
+  font-size: 28px;
+  color: #111;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+h2 {
+  font-size: 20px;
+  color: #222;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+h3 {
+  font-size: 16px;
+  color: #444;
+  margin-top: 20px;
+}
+
+p {
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-align: justify;
+}
+
+ul, ol {
+  font-size: 14px;
+  margin-bottom: 15px;
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+strong {
+  color: #000;
+}
+
+hr {
+  border: 0;
+  border-top: 1px dashed #ddd;
+  margin: 30px 0;
+}
+
+/* Print specific styles for neat pages */
+@page {
+  margin: 2cm;
+}
+
+h2, h3 {
+  page-break-after: avoid;
+}
+
+p, li {
+  page-break-inside: avoid;
+}
