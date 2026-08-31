@@ -121,6 +121,13 @@ src/
 | GET | /api/export?type=transactions | Export data CSV |
 | GET | /api/stats | Platform statistics |
 
+## 👥 Tim Pengembang (Authors)
+
+- **Nur Hidayat Surya Pamungkas**
+- **Muhammad Bazwa Arigusna**
+- **Alvia Nabila Azzahra**
+
 ## 📜 Lisensi
 
-Hak cipta © 2026 TrustChain UMKM Team. All rights reserved.
+Project ini dilisensikan di bawah [MIT License](LICENSE).  
+Copyright © 2026 Nur Hidayat Surya Pamungkas, Muhammad Bazwa Arigusna, Alvia Nabila Azzahra. All rights reserved.
