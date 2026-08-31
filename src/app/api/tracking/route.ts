@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     // Check if this is the first update
     const [existing] = await pool.query<RowDataPacket[]>("SELECT count(*) as cnt FROM supply_chain_tracking WHERE transaction_id = ?", [transactionId]);
     
-    if (existing[0].cnt === 0) {
+    if (Number(existing[0]?.cnt || 0) === 0) {
       // First update, set transaction status to confirmed
       await pool.query("UPDATE transactions SET status = 'confirmed' WHERE id = ?", [transactionId]);
     }
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         [transactionId]
       );
       if (txInfo && txInfo[0]?.umkm_profile_id) {
-        calculateReliabilityScore(txInfo[0].umkm_profile_id).catch(() => {});
+        calculateReliabilityScore(Number(txInfo[0].umkm_profile_id)).catch(() => {});
       }
     } catch {}
 

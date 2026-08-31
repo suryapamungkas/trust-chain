@@ -10,13 +10,13 @@ export async function GET() {
     const payload = verifyToken(token);
     if (!payload) return NextResponse.json({ error: "Invalid token" }, { status: 401 });
 
-    let docs = [];
+    let docs: unknown[] = [];
     if (payload.role === "admin") {
       docs = await getExportDocuments();
     } else if (payload.role === "umkm") {
       const profile = await getUmkmProfileByUserId(payload.userId);
       if (profile) {
-        docs = await getExportDocuments(profile.id);
+        docs = await getExportDocuments(Number(profile.id));
       }
     } else {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     }
 
     const id = await createExportDocument({
-      umkm_profile_id: profile.id,
+      umkm_profile_id: Number(profile.id),
       document_type: documentType,
       file_url: fileUrl
     });

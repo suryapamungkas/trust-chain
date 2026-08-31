@@ -18,8 +18,9 @@ export async function POST() {
     let verifiedCount = 0;
 
     for (const p of profiles) {
-      if (p.verification_status === "pending" && p.reliability_score >= 80) {
-        await verifyUmkm(p.id, "verified");
+      const score = Number(p.reliability_score) || 0;
+      if (p.verification_status === "pending" && score >= 80) {
+        await verifyUmkm(Number(p.id), "verified");
         verifiedCount++;
       }
     }

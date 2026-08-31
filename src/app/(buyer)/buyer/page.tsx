@@ -10,7 +10,7 @@ import BlockchainExplorer from "@/components/BlockchainExplorer";
 
 interface WalletData { wallet_address: string; balance_idr: number; balance_usd: number; }
 interface Tx { id: number; tx_hash: string; from_name: string; to_name: string; amount: number; currency: string; type: string; product_name: string; created_at: string; status?: string; tracking_status?: string; }
-interface TrackingEvent { id: number; status: string; location: string; created_at: string; }
+interface TrackingEvent { id: number; status: string; location: string; created_at: string; tx_hash?: string; }
 
 export default function BuyerDashboard() {
   const { user, refreshUser } = useAuth();

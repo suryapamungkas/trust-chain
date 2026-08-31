@@ -13,7 +13,7 @@ interface Product { id: number; name: string; category: string; description: str
 interface Profile { id: number; business_name: string; verification_status: string; wallet_address: string; balance_idr: number; balance_usd: number; total_products: number; reliability_score: number; }
 interface Tx { id: number; tx_hash: string; from_name: string; to_name: string; amount: number; currency: string; type: string; product_name: string; created_at: string; status?: string; tracking_status?: string; }
 interface DocumentItem { id: number; document_type: string; file_url?: string; status: string; notes?: string; created_at: string; }
-interface TrackingEvent { id: number; transaction_id: number; status: string; location: string; created_at: string; }
+interface TrackingEvent { id: number; transaction_id: number; status: string; location: string; created_at: string; tx_hash?: string; }
 
 const emptyProduct = { name: "", category: "Jamu", description: "", priceIdr: 0, priceUsd: 0, stock: 0, unit: "pcs", imageUrl: "" };
 

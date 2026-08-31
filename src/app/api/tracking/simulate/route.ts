@@ -17,9 +17,8 @@ export async function POST(req: Request) {
 
     const pool = await getDb();
     
-    // Check if tracking events already exist for this transaction to avoid duplicates
     const [existing] = await pool.query<RowDataPacket[]>("SELECT count(*) as cnt FROM supply_chain_tracking WHERE transaction_id = ?", [transactionId]);
-    if (existing[0].cnt > 0) {
+    if (Number(existing[0]?.cnt || 0) > 0) {
       return NextResponse.json({ error: "Tracking already simulated for this transaction" }, { status: 400 });
     }
 

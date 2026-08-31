@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest) {
     if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 
     const body = await req.json();
-    await updateUmkmProfile(profile.id, body);
+    await updateUmkmProfile(Number(profile.id), body);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("UMKM profile PUT error:", error);

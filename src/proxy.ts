@@ -11,6 +11,10 @@ function getJwtSecretBytes(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
+export async function proxy(req: NextRequest) {
+  return middleware(req);
+}
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 

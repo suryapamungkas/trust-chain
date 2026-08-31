@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       // UMKM sees their own products (all statuses) unless global is set
       if (!finalUmkmProfileId) {
         const umkmProfile = await getUmkmProfileByUserId(payload.userId);
-        if (umkmProfile) finalUmkmProfileId = umkmProfile.id;
+        if (umkmProfile) finalUmkmProfileId = Number(umkmProfile.id);
       }
     } else {
       // Public / buyers only see active products
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const id = await createProduct({
-      umkmProfileId: profile.id,
+      umkmProfileId: Number(profile.id),
       name: body.name,
       category: body.category || "Jamu",
       description: body.description || "",

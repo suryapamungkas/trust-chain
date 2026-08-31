@@ -108,7 +108,7 @@ export function generateTxHash(): string {
 // =====================================================================
 // SCHEMA
 // =====================================================================
-async function initializeSchema(pool: mysql.Pool) {
+async function initializeSchema(pool: PoolInterface) {
   await pool.query("SET FOREIGN_KEY_CHECKS=0;");
 
   const tables = [
@@ -337,7 +337,7 @@ async function initializeSchema(pool: mysql.Pool) {
   const [rows] = (await pool.query(
     "SELECT COUNT(*) as cnt FROM users"
   )) as [RowDataPacket[], unknown];
-  if (rows[0].cnt > 0) return;
+  if (Number(rows[0]?.cnt || 0) > 0) return;
 
   await seedDemoData(pool);
 }
@@ -785,9 +785,10 @@ export async function purchaseProduct(buyerUserId: number, productId: number, qu
     const [productRows] = await conn.query("SELECT p.*, u.business_name as umkm_name, us.wallet_address as umkm_wallet, us.id as umkm_user_id FROM products p LEFT JOIN umkm_profiles u ON p.umkm_profile_id = u.id LEFT JOIN users us ON u.user_id = us.id WHERE p.id = ?", [productId]);
     const product = (productRows as RowDataPacket[])[0];
     if (!product) throw new Error("Produk tidak ditemukan");
-    if (product.stock < quantity) throw new Error("Stok tidak mencukupi");
+    const stock = Number(product.stock) || 0;
+    if (stock < quantity) throw new Error("Stok tidak mencukupi");
 
-    const price = currency === "USD" ? product.price_usd : product.price_idr;
+    const price = Number(currency === "USD" ? product.price_usd : product.price_idr) || 0;
     const subtotal = price * quantity;
     const taxRate = 0.11; // 11% PPN
     const taxAmount = subtotal * taxRate;
@@ -798,9 +799,10 @@ export async function purchaseProduct(buyerUserId: number, productId: number, qu
     if (!buyer) throw new Error("Buyer tidak ditemukan");
 
     const balanceField = currency === "USD" ? "balance_usd" : "balance_idr";
-    if (buyer[balanceField] < buyerPays) throw new Error("Saldo tidak mencukupi");
+    const buyerBalance = Number(buyer[balanceField]) || 0;
+    if (buyerBalance < buyerPays) throw new Error("Saldo tidak mencukupi");
 
-    const sellerUserId = product.umkm_user_id;
+    const sellerUserId = Number(product.umkm_user_id);
 
     // Get Admin User
     const [adminRows] = await conn.query("SELECT id, wallet_address FROM users WHERE role = 'admin' LIMIT 1");
@@ -863,7 +865,7 @@ export async function purchaseProduct(buyerUserId: number, productId: number, qu
 
     // Trigger dynamic reliability score calculation in background
     if (product.umkm_profile_id) {
-      calculateReliabilityScore(product.umkm_profile_id).catch(() => {});
+      calculateReliabilityScore(Number(product.umkm_profile_id)).catch(() => {});
     }
 
     return { txHash, totalAmount: buyerPays };
@@ -1106,7 +1108,7 @@ export async function calculateReliabilityScore(umkmProfileId: number): Promise<
     "SELECT COUNT(*) as cnt FROM transactions t JOIN umkm_profiles up ON t.to_user_id = up.user_id WHERE up.id = ? AND t.status = 'confirmed' AND t.type = 'purchase'",
     [umkmProfileId]
   );
-  const txCount = txRows[0]?.cnt || 0;
+  const txCount = Number(txRows[0]?.cnt || 0);
   const txScore = Math.min(100, txCount * 10); // 10 per tx, max 100
 
   // 2. Supply chain tracking completeness (25% weight)
@@ -1114,7 +1116,7 @@ export async function calculateReliabilityScore(umkmProfileId: number): Promise<
     "SELECT COUNT(*) as cnt FROM supply_chain_tracking s JOIN transactions t ON s.transaction_id = t.id JOIN umkm_profiles up ON t.to_user_id = up.user_id WHERE up.id = ?",
     [umkmProfileId]
   );
-  const trackCount = trackRows[0]?.cnt || 0;
+  const trackCount = Number(trackRows[0]?.cnt || 0);
   const trackScore = Math.min(100, trackCount * 5); // 5 per event, max 100
 
   // 3. Certifications (20% weight)
@@ -1124,7 +1126,8 @@ export async function calculateReliabilityScore(umkmProfileId: number): Promise<
   );
   let certCount = 0;
   try {
-    const certs = JSON.parse(certRows[0]?.certifications || "[]");
+    const rawCerts = certRows[0]?.certifications;
+    const certs = typeof rawCerts === "string" ? JSON.parse(rawCerts) : (Array.isArray(rawCerts) ? rawCerts : []);
     certCount = Array.isArray(certs) ? certs.length : 0;
   } catch { certCount = 0; }
   const certScore = Math.min(100, certCount * 25); // 25 per cert, max 100
@@ -1134,7 +1137,7 @@ export async function calculateReliabilityScore(umkmProfileId: number): Promise<
     "SELECT DATEDIFF(NOW(), joined_at) as days FROM umkm_profiles WHERE id = ?",
     [umkmProfileId]
   );
-  const ageDays = ageRows[0]?.days || 0;
+  const ageDays = Number(ageRows[0]?.days || 0);
   const ageScore = Math.min(100, ageDays * 2); // 2 per day, max 100
 
   // 5. Product activity (15% weight)
@@ -1142,7 +1145,7 @@ export async function calculateReliabilityScore(umkmProfileId: number): Promise<
     "SELECT COUNT(*) as cnt FROM products WHERE umkm_profile_id = ? AND status = 'active'",
     [umkmProfileId]
   );
-  const prodCount = prodRows[0]?.cnt || 0;
+  const prodCount = Number(prodRows[0]?.cnt || 0);
   const prodScore = Math.min(100, prodCount * 20); // 20 per product, max 100
 
   // Weighted average
@@ -1416,8 +1419,8 @@ export async function getProductAverageRating(productId: number) {
     [productId]
   );
   return {
-    avgRating: rows[0]?.avg_rating ? Math.round(rows[0].avg_rating * 10) / 10 : 0,
-    reviewCount: rows[0]?.review_count || 0,
+    avgRating: rows[0]?.avg_rating ? Math.round(Number(rows[0].avg_rating) * 10) / 10 : 0,
+    reviewCount: Number(rows[0]?.review_count || 0),
   };
 }
 
@@ -1536,7 +1539,7 @@ export async function updateUserProfile(userId: number, data: Record<string, unk
       for (const [k, v] of Object.entries(profileData)) {
         mappedData[fieldMap[k] || k] = v;
       }
-      await updateUmkmProfile(profile.id, mappedData);
+      await updateUmkmProfile(Number(profile.id), mappedData);
     }
   }
 

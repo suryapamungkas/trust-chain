@@ -19,16 +19,16 @@ export async function GET(
     // Get supply chain tracking events
     let trackingEvents: RowDataPacket[] = [];
     try {
-      trackingEvents = await getTrackingEvents(transaction.id);
+      trackingEvents = (await getTrackingEvents(Number(transaction.id))) as RowDataPacket[];
     } catch {
       trackingEvents = [];
     }
 
     // Parse certifications safely
     let productCerts: string[] = [];
-    try { productCerts = JSON.parse(transaction.product_certifications || "[]"); } catch { productCerts = []; }
+    try { productCerts = JSON.parse(String(transaction.product_certifications || "[]")); } catch { productCerts = []; }
     let umkmCerts: string[] = [];
-    try { umkmCerts = JSON.parse(transaction.umkm_certifications || "[]"); } catch { umkmCerts = []; }
+    try { umkmCerts = JSON.parse(String(transaction.umkm_certifications || "[]")); } catch { umkmCerts = []; }
 
     return NextResponse.json({
       verified: true,

@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     "cpanel_next_reference/**",
     "scripts/**",
     "public/**",
+    "server.js",
   ]),
 ]);
 

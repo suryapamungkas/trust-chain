@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     let profiles = await getAllUmkmProfiles();
 
     // In-memory filter
-    if (search) profiles = profiles.filter((p: RowDataPacket) => p.business_name?.toLowerCase().includes(search) || p.user_name?.toLowerCase().includes(search));
+    if (search) profiles = profiles.filter((p: RowDataPacket) => String(p.business_name || "").toLowerCase().includes(search) || String(p.user_name || "").toLowerCase().includes(search));
     if (province) profiles = profiles.filter((p: RowDataPacket) => p.province === province);
     if (category) profiles = profiles.filter((p: RowDataPacket) => p.category === category);
     if (verification) profiles = profiles.filter((p: RowDataPacket) => p.verification_status === verification);

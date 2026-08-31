@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
-interface User {
+export interface User {
   id: number;
   name: string;
   email: string;
@@ -18,7 +18,7 @@ interface User {
   lastLogin?: string;
 }
 
-interface Notification {
+export interface Notification {
   id: number;
   title: string;
   message: string;

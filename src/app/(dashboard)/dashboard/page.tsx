@@ -13,9 +13,9 @@ interface UmkmProfile { id: number; user_name: string; business_name: string; em
 interface UserRow { id: number; name: string; email: string; role: string; wallet_address: string; balance_idr: number; balance_usd: number; is_active: number; created_at: string; }
 interface Tx { id: number; tx_hash: string; from_name: string; to_name: string; amount: number; currency: string; type: string; status: string; product_name: string; created_at: string; }
 interface ProductRow { id: number; name: string; category: string; description?: string; price_idr: number; price_usd: number; stock: number; unit: string; umkm_name?: string; status: string; image_url?: string; }
-interface DocumentRow { id: number; umkm_id?: number; business_name?: string; document_type: string; file_url?: string; status: string; notes?: string; created_at: string; }
+interface DocumentRow { id: number; umkm_id?: number; umkm_name?: string; business_name?: string; document_type: string; file_url?: string; status: string; notes?: string; created_at: string; }
 interface WalletInfo { wallet_address: string; balance_idr: number; balance_usd: number; }
-interface SupplyEvent { id: number; transaction_id: number; status: string; location: string; created_at: string; product_name?: string; }
+interface SupplyEvent { id: number; transaction_id: number; status: string; location: string; created_at: string; product_name?: string; tx_hash?: string; }
 
 export default function AdminDashboard() {
   const { user } = useAuth();

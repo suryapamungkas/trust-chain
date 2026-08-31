@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, User as AuthUser } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { MessageCircle, Send, ArrowLeft, X, User, Paperclip, FileText, Download, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -29,6 +29,14 @@ interface ChatRoom {
   unread_count: number;
 }
 
+interface VerifiedSeller {
+  user_id: number;
+  business_name: string;
+  category?: string;
+  city?: string;
+  [key: string]: unknown;
+}
+
 export default function ChatWidget() {
   const { user } = useAuth();
   const pathname = usePathname();
@@ -41,7 +49,7 @@ export default function ChatWidget() {
   return <ChatWidgetInner user={user} />;
 }
 
-function ChatWidgetInner({ user }: { user: Record<string, unknown> | null }) {
+function ChatWidgetInner({ user }: { user: AuthUser }) {
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
@@ -54,7 +62,7 @@ function ChatWidgetInner({ user }: { user: Record<string, unknown> | null }) {
   const [uploading, setUploading] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
   const [showSellerPicker, setShowSellerPicker] = useState(false);
-  const [verifiedSellers, setVerifiedSellers] = useState<Record<string, unknown>[]>([]);
+  const [verifiedSellers, setVerifiedSellers] = useState<VerifiedSeller[]>([]);
   const [loadingSellers, setLoadingSellers] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);

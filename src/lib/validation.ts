@@ -35,7 +35,7 @@ export const registerSchema = z.object({
     .min(8, "Password minimal 8 karakter")
     .max(128, "Password terlalu panjang"),
   role: z.enum(["umkm", "buyer"], {
-    errorMap: () => ({ message: "Role harus 'umkm' atau 'buyer'" }),
+    message: "Role harus 'umkm' atau 'buyer'",
   }),
   businessName: z
     .string()
@@ -132,7 +132,7 @@ export const topUpSchema = z.object({
     .number()
     .positive("Jumlah harus lebih dari 0"),
   currency: z.enum(["IDR", "USD"], {
-    errorMap: () => ({ message: "Currency harus 'IDR' atau 'USD'" }),
+    message: "Currency harus 'IDR' atau 'USD'",
   }),
 });
 

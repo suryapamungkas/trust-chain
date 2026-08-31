@@ -130,7 +130,7 @@ export default function Topbar({ title, subtitle, onToggleSidebar }: TopbarProps
                 {notifications.length === 0 ? (
                   <div style={{ padding: "24px 16px", textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>{t("topbar.no_notifications")}</div>
                 ) : (
-                  notifications.slice(0, 6).map((n: { id: number; read?: number; type?: string; title?: string; message?: string }) => (
+                  notifications.slice(0, 6).map((n: { id: number; read?: number; type?: string; title?: string; message?: string; created_at?: string }) => (
                     <div key={n.id} style={{
                       padding: "12px 16px", borderBottom: "1px solid var(--border-subtle)",
                       background: n.read === 0 ? "rgba(255,255,255,0.04)" : "transparent",
@@ -143,7 +143,7 @@ export default function Topbar({ title, subtitle, onToggleSidebar }: TopbarProps
                         <div>
                           <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text-primary)", marginBottom: 2 }}>{n.title}</div>
                           <div style={{ fontSize: 11.5, color: "var(--text-secondary)", lineHeight: 1.4 }}>{n.message}</div>
-                          <div style={{ fontSize: 10.5, color: "var(--text-muted)", marginTop: 4 }}>{new Date(n.created_at).toLocaleDateString("id-ID")}</div>
+                          <div style={{ fontSize: 10.5, color: "var(--text-muted)", marginTop: 4 }}>{n.created_at ? new Date(n.created_at).toLocaleDateString("id-ID") : ""}</div>
                         </div>
                         {n.read === 0 && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--text-primary)", flexShrink: 0, marginTop: 4 }} />}
                       </div>
