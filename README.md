@@ -1,3 +1,5 @@
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/927c6afd-edea-436b-9ada-853b02265986" />
+
 # TrustChain UMKM
 
 Platform digital berbasis **AI** dan **Blockchain** untuk mencatat seluruh perjalanan produk UMKM obat tradisional Indonesia — dari bahan baku hingga ekspor.
