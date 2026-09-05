@@ -1,6 +1,4 @@
-<div align="center">
-
-<img width="1920" height="1080" alt="TrustChain UMKM Banner" src="https://github.com/user-attachments/assets/927c6afd-edea-436b-9ada-853b02265986" />
+<img width="1920" height="1080" alt="Screenshot 2026-09-05 212842" src="https://github.com/user-attachments/assets/a44826e2-f679-4a43-a0c4-53f09db83128" />
 
 # 🌿 TrustChain UMKM
 
