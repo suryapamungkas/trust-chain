@@ -8,15 +8,10 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Globe } from "lucide-react";
 
-const ROLES = [
-  { value: "umkm", label: "Pelaku UMKM", icon: "◈", desc: "Daftarkan bisnis lokal Anda ke ekosistem blockchain" },
-  { value: "buyer", label: "Buyer / Investor", icon: "⬢", desc: "Temukan peluang investasi UMKM terpercaya" },
-];
-
 export default function RegisterPage() {
   const { register } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { lang, setLang } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const [step, setStep] = useState(1);
   const [role, setRole] = useState<"umkm" | "buyer" | "">("");
   const [form, setForm] = useState({
@@ -41,11 +36,26 @@ export default function RegisterPage() {
   };
 
   const handleNext = () => {
-    if (!role) { setError("Pilih tipe akun terlebih dahulu."); return; }
-    if (!form.name.trim()) { setError("Nama lengkap wajib diisi."); return; }
-    if (!form.email.includes("@")) { setError("Format email tidak valid."); return; }
-    if (form.password.length < 6) { setError("Password minimal 6 karakter."); return; }
-    if (form.password !== form.confirmPassword) { setError("Password tidak cocok."); return; }
+    if (!role) { 
+      setError(lang === "id" ? "Pilih tipe akun terlebih dahulu." : "Please select an account role first."); 
+      return; 
+    }
+    if (!form.name.trim()) { 
+      setError(lang === "id" ? "Nama lengkap wajib diisi." : "Full name is required."); 
+      return; 
+    }
+    if (!form.email.includes("@")) { 
+      setError(lang === "id" ? "Format email tidak valid." : "Invalid email address format."); 
+      return; 
+    }
+    if (form.password.length < 6) { 
+      setError(lang === "id" ? "Password minimal 6 karakter." : "Password must be at least 6 characters."); 
+      return; 
+    }
+    if (form.password !== form.confirmPassword) { 
+      setError(lang === "id" ? "Password tidak cocok." : "Passwords do not match."); 
+      return; 
+    }
     setError(""); setStep(2);
   };
 
@@ -57,7 +67,7 @@ export default function RegisterPage() {
       role, businessName: form.businessName, companyName: form.companyName,
       province: form.province, city: form.city, country: form.country,
     });
-    if (!result.success) { setError(result.error || "Pendaftaran gagal."); setLoading(false); }
+    if (!result.success) { setError(result.error || (lang === "id" ? "Pendaftaran gagal." : "Registration failed.")); setLoading(false); }
   };
 
   return (
@@ -90,17 +100,23 @@ export default function RegisterPage() {
           </div>
 
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 32, fontWeight: 800, color: "var(--text-primary)", lineHeight: 1.25, marginBottom: 16, letterSpacing: "-0.02em" }}>
-            Bergabung &<br/><span className="gradient-text">Bangun Kepercayaan</span>
+            {lang === "id" ? (
+              <>Bergabung &<br/><span className="gradient-text">Bangun Kepercayaan</span></>
+            ) : (
+              <>Join &<br/><span className="gradient-text">Build Proven Trust</span></>
+            )}
           </h1>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 40 }}>
-            Daftarkan bisnis Anda dan dapatkan akses ke ekosistem blockchain yang transparan dan terpercaya.
+            {lang === "id"
+              ? "Daftarkan bisnis Anda dan dapatkan akses ke ekosistem blockchain yang transparan dan terpercaya."
+              : "Register your enterprise and unlock access to an immutable, globally verified trade ecosystem."}
           </p>
 
           {/* Steps indicator */}
           {[
-            { n: 1, lbl: "Info Akun", desc: "Email, password, tipe akun" },
-            { n: 2, lbl: "Detail Profil", desc: "Info bisnis & lokasi" },
-            { n: 3, lbl: "Selesai", desc: "Akun siap digunakan" },
+            { n: 1, lbl: lang === "id" ? "Info Akun" : "Account Info", desc: lang === "id" ? "Email, password, tipe akun" : "Email, password, role" },
+            { n: 2, lbl: lang === "id" ? "Detail Profil" : "Profile Details", desc: lang === "id" ? "Info bisnis & lokasi" : "Business & location" },
+            { n: 3, lbl: lang === "id" ? "Selesai" : "Complete", desc: lang === "id" ? "Akun siap digunakan" : "Ready for use" },
           ].map(s => (
             <div key={s.n} style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
               <div style={{
@@ -143,7 +159,7 @@ export default function RegisterPage() {
                 transition: "all 0.2s ease",
               }}
             >
-              ← {lang === "id" ? "Kembali ke Beranda" : "Back to Home"}
+              ← {t("auth.back_home")}
             </Link>
           )}
         </div>
@@ -186,11 +202,11 @@ export default function RegisterPage() {
         <div style={{ maxWidth: 400, width: "100%", margin: "0 auto" }}>
           <div style={{ marginBottom: 28 }}>
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 24, fontWeight: 800, color: "var(--text-primary)", marginBottom: 6, letterSpacing: "-0.02em" }}>
-              {step === 1 ? "Buat Akun Baru" : "Lengkapi Profil"}
+              {step === 1 ? t("auth.register_title") : (lang === "id" ? "Lengkapi Profil" : "Complete Profile")}
             </h2>
             <p style={{ fontSize: 13.5, color: "var(--text-secondary)" }}>
-              Sudah punya akun?{" "}
-              <Link href="/login" style={{ color: "var(--text-primary)", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3 }}>Masuk di sini</Link>
+              {t("auth.has_account")}{" "}
+              <Link href="/login" style={{ color: "var(--text-primary)", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3 }}>{t("auth.login")}</Link>
             </p>
           </div>
 
@@ -198,9 +214,14 @@ export default function RegisterPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {/* Role selection */}
               <div>
-                <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>Daftar sebagai</label>
+                <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  {lang === "id" ? "Daftar sebagai" : "Register as"}
+                </label>
                 <div style={{ display: "flex", gap: 10 }}>
-                  {ROLES.map(r => (
+                  {[
+                    { value: "umkm", label: t("auth.role_umkm"), icon: "◈", desc: t("auth.role_umkm_desc") },
+                    { value: "buyer", label: t("auth.role_buyer"), icon: "⬢", desc: t("auth.role_buyer_desc") },
+                  ].map(r => (
                     <button key={r.value} type="button" onClick={() => { setRole(r.value as "umkm"|"buyer"); setError(""); }}
                       style={{
                         flex: 1, padding: "14px 10px", borderRadius: 12, cursor: "pointer", textAlign: "center",
@@ -217,29 +238,29 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Nama Lengkap</label>
-                <input name="name" value={form.name} onChange={handleChange} className="custom-input" placeholder="Nama lengkap Anda" id="reg-name" />
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{t("auth.name")}</label>
+                <input name="name" value={form.name} onChange={handleChange} className="custom-input" placeholder={lang === "id" ? "Nama lengkap Anda" : "Your full name"} id="reg-name" />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Email</label>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{t("auth.email")}</label>
                 <input name="email" type="email" value={form.email} onChange={handleChange} className="custom-input" placeholder="email@example.com" id="reg-email" />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Password</label>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{t("auth.password")}</label>
                 <div style={{ position: "relative" }}>
-                  <input name="password" type={showPass ? "text" : "password"} value={form.password} onChange={handleChange} className="custom-input" placeholder="Min. 6 karakter" id="reg-password" style={{ paddingRight: 44 }} />
+                  <input name="password" type={showPass ? "text" : "password"} value={form.password} onChange={handleChange} className="custom-input" placeholder={lang === "id" ? "Min. 6 karakter" : "Min. 6 characters"} id="reg-password" style={{ paddingRight: 44 }} />
                   <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: 14, fontFamily: "inherit" }}>
                     {showPass ? "◌" : "◉"}
                   </button>
                 </div>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Konfirmasi Password</label>
-                <input name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} className="custom-input" placeholder="Ulangi password" id="reg-confirm-password" />
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{t("auth.confirm_password")}</label>
+                <input name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} className="custom-input" placeholder={lang === "id" ? "Ulangi password" : "Re-enter password"} id="reg-confirm-password" />
               </div>
               {error && <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)", color: "var(--text-secondary)", fontSize: 13 }}>⚠ {error}</div>}
               <button type="button" onClick={handleNext} className="btn-primary" style={{ width: "100%", justifyContent: "center", padding: "13px 0", marginTop: 6 }}>
-                Lanjutkan →
+                {lang === "id" ? "Lanjutkan →" : "Continue →"}
               </button>
             </div>
           )}
@@ -249,29 +270,29 @@ export default function RegisterPage() {
               {role === "umkm" ? (
                 <>
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Nama Usaha</label>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{t("auth.business_name")}</label>
                     <input name="businessName" value={form.businessName} onChange={handleChange} className="custom-input" placeholder="Contoh: Batik Sekar Jaya" id="reg-business-name" />
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Provinsi</label>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{t("auth.province")}</label>
                     <select name="province" value={form.province} onChange={handleChange} className="custom-select" id="reg-province">
-                      <option value="">Pilih Provinsi</option>
+                      <option value="">{lang === "id" ? "Pilih Provinsi" : "Select Province"}</option>
                       {PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Kota</label>
-                    <input name="city" value={form.city} onChange={handleChange} className="custom-input" placeholder="Nama kota/kabupaten" id="reg-city" />
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{t("auth.city")}</label>
+                    <input name="city" value={form.city} onChange={handleChange} className="custom-input" placeholder={lang === "id" ? "Nama kota/kabupaten" : "City or Regency name"} id="reg-city" />
                   </div>
                 </>
               ) : (
                 <>
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Nama Perusahaan</label>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{t("auth.company_name")}</label>
                     <input name="companyName" value={form.companyName} onChange={handleChange} className="custom-input" placeholder="Contoh: PT Investasi Nusantara" id="reg-company-name" />
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Negara</label>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{t("auth.country")}</label>
                     <input name="country" value={form.country} onChange={handleChange} className="custom-input" placeholder="Indonesia" id="reg-country" />
                   </div>
                 </>
@@ -280,9 +301,9 @@ export default function RegisterPage() {
               {error && <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)", color: "var(--text-secondary)", fontSize: 13 }}>⚠ {error}</div>}
 
               <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
-                <button type="button" onClick={() => setStep(1)} className="btn-secondary" style={{ flex: 1, justifyContent: "center" }}>← Kembali</button>
+                <button type="button" onClick={() => setStep(1)} className="btn-secondary" style={{ flex: 1, justifyContent: "center" }}>← {t("common.back")}</button>
                 <button type="submit" disabled={loading} className="btn-primary" id="reg-submit" style={{ flex: 2, justifyContent: "center" }}>
-                  {loading ? "Mendaftarkan..." : "Buat Akun →"}
+                  {loading ? t("common.loading") : (lang === "id" ? "Buat Akun →" : "Create Account →")}
                 </button>
               </div>
             </form>

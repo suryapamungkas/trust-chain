@@ -3,7 +3,7 @@ import { deleteExportDocument } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const token = (await cookies()).get("tc_token")?.value;
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

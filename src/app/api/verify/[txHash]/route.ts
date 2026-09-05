@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTransactionByHash, getTrackingEvents, RowDataPacket } from "@/lib/db";
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ txHash: string }> }
 ) {
   try {

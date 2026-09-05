@@ -11,6 +11,8 @@ interface LanguageContextType {
   lang: Lang;
   setLang: (l: Lang) => void;
   t: (key: string) => string;
+  formatCurrency: (val: number, currency?: string) => string;
+  formatDate: (date: string | number | Date, options?: Intl.DateTimeFormatOptions) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | null>(null);
@@ -55,8 +57,29 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return typeof val === "string" ? val : key;
   }, [lang]);
 
+  const formatCurrency = useCallback((val: number, currency: string = "IDR"): string => {
+    if (currency === "USD") {
+      return `$ ${new Intl.NumberFormat(lang === "id" ? "id-ID" : "en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(val)}`;
+    }
+    const symbol = lang === "id" ? "Rp " : "IDR ";
+    return `${symbol}${new Intl.NumberFormat(lang === "id" ? "id-ID" : "en-US").format(val)}`;
+  }, [lang]);
+
+  const formatDate = useCallback((date: string | number | Date, options?: Intl.DateTimeFormatOptions): string => {
+    try {
+      const d = new Date(date);
+      const defaultOpts: Intl.DateTimeFormatOptions = options || {
+        dateStyle: "medium",
+        timeStyle: "short",
+      };
+      return new Intl.DateTimeFormat(lang === "id" ? "id-ID" : "en-US", defaultOpts).format(d);
+    } catch {
+      return String(date);
+    }
+  }, [lang]);
+
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t }}>
+    <LanguageContext.Provider value={{ lang, setLang, t, formatCurrency, formatDate }}>
       {children}
     </LanguageContext.Provider>
   );
@@ -70,6 +93,8 @@ export function useLanguage() {
       lang: "id" as Lang,
       setLang: () => {},
       t: (key: string) => key,
+      formatCurrency: (val: number, currency: string = "IDR") => `${currency === "USD" ? "$" : "Rp"} ${val.toLocaleString()}`,
+      formatDate: (date: string | number | Date) => String(date),
     };
   }
   return ctx;

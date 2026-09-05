@@ -1,13 +1,10 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
 import { mockCreditAssessments, formatCurrency } from "@/lib/database";
 import { ScoreRing } from "@/components/UIComponents";
 import { useState, useEffect } from "react";
 
 export default function UmkmCreditPage() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { user } = useAuth();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [umkmProfile, setUmkmProfile] = useState<any>(null);
 

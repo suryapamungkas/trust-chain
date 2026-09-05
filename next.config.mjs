@@ -12,6 +12,9 @@ const nextConfig = {
     ],
   },
   serverExternalPackages: ["mysql2", "bcryptjs", "jsonwebtoken", "ethers"],
+  experimental: {
+    optimizePackageImports: ["lucide-react", "recharts"],
+  },
 };
 
 export default nextConfig;

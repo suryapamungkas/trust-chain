@@ -14,7 +14,7 @@ interface TrackingEvent { id: number; status: string; location: string; created_
 
 export default function BuyerDashboard() {
   const { user, refreshUser } = useAuth();
-  const { t, lang } = useLanguage();
+  const { t, lang, formatCurrency, formatDate } = useLanguage();
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [txs, setTxs] = useState<Tx[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +39,7 @@ export default function BuyerDashboard() {
         fetch("/api/transactions").then(r => r.json()),
       ]);
       setWallet(w); setTxs(Array.isArray(t) ? t : []);
-    } catch { toast.error("Gagal memuat data"); }
+    } catch { toast.error(lang === "id" ? "Gagal memuat data" : "Failed to load data"); }
     setLoading(false);
   };
 
@@ -55,11 +55,17 @@ export default function BuyerDashboard() {
   }, [showTopUp, qrisStep, timeLeft]);
 
   const copyAddress = () => {
-    if (wallet?.wallet_address) { navigator.clipboard.writeText(wallet.wallet_address); toast.success("Alamat wallet disalin"); }
+    if (wallet?.wallet_address) { 
+      navigator.clipboard.writeText(wallet.wallet_address); 
+      toast.success(lang === "id" ? "Alamat wallet disalin" : "Wallet address copied"); 
+    }
   };
 
   const handleTopUp = async () => {
-    if (topUpAmount <= 0) { toast.error("Jumlah harus lebih dari 0"); return; }
+    if (topUpAmount <= 0) { 
+      toast.error(lang === "id" ? "Jumlah harus lebih dari 0" : "Amount must be greater than 0"); 
+      return; 
+    }
     setToppingUp(true);
     try {
       const res = await fetch("/api/wallet", {
@@ -67,11 +73,15 @@ export default function BuyerDashboard() {
         body: JSON.stringify({ amount: topUpAmount, currency: topUpCurrency }),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error || "Top-up gagal"); setToppingUp(false); return; }
-      toast.success("Top-up berhasil!");
+      if (!res.ok) { 
+        toast.error(data.error || (lang === "id" ? "Top-up gagal" : "Top-up failed")); 
+        setToppingUp(false); 
+        return; 
+      }
+      toast.success(lang === "id" ? "Top-up berhasil!" : "Top-up successful!");
       closeTopUp();
       loadData(); refreshUser();
-    } catch { toast.error("Top-up gagal"); }
+    } catch { toast.error(lang === "id" ? "Top-up gagal" : "Top-up failed"); }
     setToppingUp(false);
   };
 
@@ -90,17 +100,15 @@ export default function BuyerDashboard() {
       const data = await res.json();
       setTrackingEvents(Array.isArray(data) ? data : []);
     } catch {
-      toast.error("Gagal memuat tracking");
+      toast.error(lang === "id" ? "Gagal memuat tracking" : "Failed to load tracking data");
     }
     setTrackingLoading(false);
   };
 
-  const fmtCurrency = (v: number) => new Intl.NumberFormat("id-ID").format(v);
   const truncate = (s: string, n: number = 12) => s ? s.slice(0, n) + "..." + s.slice(-4) : "-";
-  const fmtDate = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
 
   const handleUpdateTracking = async (id: number, status: string, location: string) => {
-    toast.loading("Mengonfirmasi pesanan...", { id: "track" });
+    toast.loading(lang === "id" ? "Mengonfirmasi pesanan..." : "Confirming order...", { id: "track" });
     try {
       const res = await fetch("/api/tracking", {
         method: "POST",
@@ -108,20 +116,20 @@ export default function BuyerDashboard() {
         body: JSON.stringify({ transactionId: id, status, location })
       });
       if (res.ok) {
-        toast.success(`Berhasil dikonfirmasi!`, { id: "track" });
+        toast.success(lang === "id" ? "Berhasil dikonfirmasi!" : "Successfully confirmed!", { id: "track" });
         loadData();
       } else {
         const data = await res.json();
-        toast.error(data.error || "Gagal", { id: "track" });
+        toast.error(data.error || (lang === "id" ? "Gagal" : "Failed"), { id: "track" });
       }
     } catch {
-      toast.error("Error jaringan", { id: "track" });
+      toast.error(lang === "id" ? "Error jaringan" : "Network error", { id: "track" });
     }
   };
 
   if (loading) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "80vh", color: "var(--text-secondary)" }}>
-      <div style={{ textAlign: "center" }}><div style={{ fontSize: 32, marginBottom: 12, animation: "spin 1s linear infinite" }}>⟳</div><div>Memuat marketplace...</div></div>
+      <div style={{ textAlign: "center" }}><div style={{ fontSize: 32, marginBottom: 12, animation: "spin 1s linear infinite" }}>⟳</div><div>{t("common.loading")}</div></div>
     </div>
   );
 
@@ -151,11 +159,11 @@ export default function BuyerDashboard() {
           <div style={{ display: "flex", gap: 32 }}>
             <div>
               <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 4 }}>{t("buyer.balance_idr")}</div>
-              <div style={{ fontSize: 26, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Rp {fmtCurrency(wallet?.balance_idr || 0)}</div>
+              <div style={{ fontSize: 26, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{formatCurrency(wallet?.balance_idr || 0, "IDR")}</div>
             </div>
             <div>
               <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 4 }}>{t("buyer.balance_usd")}</div>
-              <div style={{ fontSize: 26, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$ {fmtCurrency(wallet?.balance_usd || 0)}</div>
+              <div style={{ fontSize: 26, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{formatCurrency(wallet?.balance_usd || 0, "USD")}</div>
             </div>
           </div>
         </div>
@@ -179,7 +187,7 @@ export default function BuyerDashboard() {
             <Package size={16} /> {lang === "id" ? "Total Pembelian (IDR)" : "Total Purchases (IDR)"}
           </div>
           <div style={{ fontSize: 24, fontWeight: 800 }}>
-            Rp {fmtCurrency(txs.filter(t => t.type === 'purchase').reduce((acc, curr) => acc + curr.amount, 0))}
+            {formatCurrency(txs.filter(t => t.type === 'purchase').reduce((acc, curr) => acc + curr.amount, 0), "IDR")}
           </div>
         </div>
         <div style={{ background: "var(--bg-card)", borderRadius: 16, padding: 20, border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", gap: 8 }}>
@@ -204,25 +212,25 @@ export default function BuyerDashboard() {
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>{tx.product_name}</div>
                   <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
-                    Tx Hash: <span onClick={() => window.open(`/verify/${tx.tx_hash}`, '_blank')} style={{ fontFamily: "'JetBrains Mono', monospace", color: "#3b82f6", cursor: "pointer", textDecoration: "underline" }}>{truncate(tx.tx_hash)}</span> • {fmtDate(tx.created_at)}
+                    Tx Hash: <span onClick={() => window.open(`/verify/${tx.tx_hash}`, '_blank')} style={{ fontFamily: "'JetBrains Mono', monospace", color: "#3b82f6", cursor: "pointer", textDecoration: "underline" }}>{truncate(tx.tx_hash)}</span> • {formatDate(tx.created_at)}
                   </div>
                   <div style={{ fontSize: 11, fontWeight: 700, display: "inline-block", padding: "2px 6px", borderRadius: 4, background: tx.tracking_status === "Pesanan Diterima" ? "#22c55e" : "var(--bg-tertiary)", color: tx.tracking_status === "Pesanan Diterima" ? "#fff" : "var(--text-secondary)" }}>Status: {tx.tracking_status || tx.status}</div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     <button onClick={() => (window as unknown as { openTrustChainChat?: (id: number) => void }).openTrustChainChat?.(2)} style={{ padding: "8px 14px", borderRadius: 8, background: "rgba(59,130,246,0.15)", color: "#3b82f6", border: "1px solid rgba(59,130,246,0.3)", cursor: "pointer", fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-                      💬 Chat Penjual
+                      {lang === "id" ? "💬 Chat Penjual" : "💬 Chat Seller"}
                     </button>
                     <button onClick={() => openTracking(tx.id)} style={{ padding: "8px 14px", borderRadius: 8, background: "transparent", color: "var(--text-primary)", border: "1px solid var(--text-primary)", cursor: "pointer", fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-                      <Package size={14} /> Lacak Pesanan
+                      <Package size={14} /> {lang === "id" ? "Lacak Pesanan" : "Track Order"}
                     </button>
                     <button onClick={() => window.open(`/verify/${tx.tx_hash}`, '_blank')} style={{ padding: "8px 14px", borderRadius: 8, background: "rgba(16,185,129,0.15)", color: "#10b981", border: "1px solid rgba(16,185,129,0.3)", cursor: "pointer", fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-                      🔍 QR Verifikasi
+                      {lang === "id" ? "🔍 QR Verifikasi" : "🔍 Verify QR"}
                     </button>
                   </div>
                   {tx.tracking_status && tx.tracking_status !== "Pesanan Diterima" && tx.tracking_status !== "Pesanan Dibuat" && (
                     <button onClick={() => handleUpdateTracking(tx.id, "Pesanan Diterima", "Alamat Pembeli")} style={{ padding: "8px 16px", borderRadius: 8, background: "#000", color: "#fff", border: "1px solid #000", cursor: "pointer", fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-                      Konfirmasi Diterima
+                      {lang === "id" ? "Konfirmasi Diterima" : "Confirm Delivery"}
                     </button>
                   )}
                 </div>
@@ -242,18 +250,22 @@ export default function BuyerDashboard() {
         <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
           <div style={{ background: "var(--bg-secondary)", borderRadius: 16, border: "1px solid var(--border-color)", padding: 28, width: "100%", maxWidth: 400 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>Top Up via QRIS</h3>
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>
+                {lang === "id" ? "Top Up via QRIS" : "Top Up via QRIS"}
+              </h3>
               <button onClick={closeTopUp} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-secondary)" }}><XIcon size={20} /></button>
             </div>
             
             {qrisStep === 1 ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Nominal (IDR)</label>
-                  <input type="number" min={10000} value={topUpAmount} onChange={e => setTopUpAmount(Number(e.target.value))} className="custom-input" placeholder="Minimal Rp 10.000" />
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
+                    {lang === "id" ? "Nominal (IDR)" : "Amount (IDR)"}
+                  </label>
+                  <input type="number" min={10000} value={topUpAmount} onChange={e => setTopUpAmount(Number(e.target.value))} className="custom-input" placeholder={lang === "id" ? "Minimal Rp 10.000" : "Minimum IDR 10,000"} />
                 </div>
                 <button onClick={() => setQrisStep(2)} disabled={topUpAmount < 10000} style={{ padding: "12px 0", borderRadius: 8, background: "#000", color: "#fff", border: "none", cursor: topUpAmount >= 10000 ? "pointer" : "not-allowed", fontSize: 14, fontWeight: 700, marginTop: 8 }}>
-                  Lanjut Buat QRIS
+                  {lang === "id" ? "Lanjut Buat QRIS" : "Generate QRIS"}
                 </button>
               </div>
             ) : (
@@ -267,17 +279,17 @@ export default function BuyerDashboard() {
                     {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
                   </div>
                   <div style={{ fontSize: 12, color: "var(--text-secondary)", textAlign: "center" }}>
-                    Scan menggunakan aplikasi Mobile Banking atau e-Wallet favorit Anda
+                    {lang === "id" ? "Scan menggunakan aplikasi Mobile Banking atau e-Wallet favorit Anda" : "Scan using your favorite mobile banking or e-wallet app"}
                   </div>
                 </div>
 
                 {timeLeft > 0 ? (
                   <button onClick={() => { setTopUpCurrency("IDR"); handleTopUp(); }} disabled={toppingUp} style={{ padding: "12px 0", borderRadius: 8, background: "#000", color: "#fff", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, marginTop: 8 }}>
-                    {toppingUp ? "Memproses..." : "Simulasi Bayar QRIS"}
+                    {toppingUp ? t("common.loading") : (lang === "id" ? "Simulasi Bayar QRIS" : "Simulate QRIS Payment")}
                   </button>
                 ) : (
                   <button onClick={() => { setQrisStep(1); setTimeLeft(180); }} style={{ padding: "12px 0", borderRadius: 8, background: "rgba(255,0,0,0.1)", color: "#ff4444", border: "1px solid rgba(255,0,0,0.2)", cursor: "pointer", fontSize: 14, fontWeight: 700, marginTop: 8 }}>
-                    QRIS Kadaluarsa - Buat Ulang
+                    {lang === "id" ? "QRIS Kadaluarsa - Buat Ulang" : "QRIS Expired - Regenerate"}
                   </button>
                 )}
               </div>
@@ -293,15 +305,21 @@ export default function BuyerDashboard() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Package size={24} style={{ color: "var(--text-primary)" }} />
-                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>Lacak Pesanan</h3>
+                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>
+                  {lang === "id" ? "Lacak Pesanan" : "Track Order"}
+                </h3>
               </div>
               <button onClick={() => setShowTracking(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-secondary)" }}><XIcon size={20} /></button>
             </div>
 
             {trackingLoading ? (
-              <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Memuat data blockchain...</div>
+              <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>
+                {lang === "id" ? "Memuat data blockchain..." : "Loading blockchain data..."}
+              </div>
             ) : trackingEvents.length === 0 ? (
-              <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Pesanan ini belum diproses oleh UMKM.</div>
+              <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>
+                {lang === "id" ? "Pesanan ini belum diproses oleh UMKM." : "This order has not yet been processed by the MSME."}
+              </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 0, position: "relative" }}>
                 {/* Vertical Line */}
@@ -315,9 +333,11 @@ export default function BuyerDashboard() {
                     <div style={{ flex: 1, background: "var(--bg-card)", padding: 16, borderRadius: 12, border: "1px solid var(--border-color)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                         <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)" }}>{ev.status}</div>
-                        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{new Date(ev.created_at).toLocaleString('id-ID')}</div>
+                        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{new Date(ev.created_at).toLocaleString(lang === 'id' ? 'id-ID' : 'en-US')}</div>
                       </div>
-                      <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 8 }}>Lokasi: <strong>{ev.location}</strong></div>
+                      <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 8 }}>
+                        {lang === "id" ? "Lokasi:" : "Location:"} <strong>{ev.location}</strong>
+                      </div>
                       <div style={{ fontSize: 10, background: "rgba(0,0,0,0.03)", padding: "6px 8px", borderRadius: 4, fontFamily: "'JetBrains Mono', monospace", color: "var(--text-muted)", display: "flex", justifyContent: "space-between", border: "1px solid var(--border-subtle)" }}>
                         <span>Hash: {ev.tx_hash ? ev.tx_hash.slice(0, 20) + "..." : "-"}</span>
                         <a href={`/verify/${ev.tx_hash}`} target="_blank" rel="noopener noreferrer" style={{ color: "#10b981", textDecoration: "none", fontWeight: 600 }}>🔍 Verify On-Chain & QR</a>

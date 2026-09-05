@@ -26,10 +26,14 @@ export default function Topbar({ title, subtitle, onToggleSidebar }: TopbarProps
 
   const handleLogout = async () => {
     await logout();
-    toast.success("Berhasil keluar.");
+    toast.success(lang === "id" ? "Berhasil keluar." : "Successfully logged out.");
   };
 
-  const roleLabel = user?.role === "admin" ? "Admin" : user?.role === "umkm" ? "Pelaku UMKM" : "Buyer/Investor";
+  const roleLabel = user?.role === "admin"
+    ? "Admin"
+    : user?.role === "umkm"
+    ? (lang === "id" ? "Pelaku UMKM" : "MSME Actor")
+    : "Buyer / Investor";
   const roleBadgeColor = user?.role === "admin" ? "#000000" : user?.role === "umkm" ? "#333333" : "#666666";
 
   return (
@@ -90,7 +94,7 @@ export default function Topbar({ title, subtitle, onToggleSidebar }: TopbarProps
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 15, transition: "all 0.2s",
           }}
-          title={theme === "dark" ? "Mode Terang" : "Mode Gelap"}
+          title={theme === "dark" ? (lang === "id" ? "Mode Terang" : "Light Mode") : (lang === "id" ? "Mode Gelap" : "Dark Mode")}
           id="theme-toggle"
         >
           {theme === "dark" ? "☀️" : "🌙"}
@@ -143,7 +147,7 @@ export default function Topbar({ title, subtitle, onToggleSidebar }: TopbarProps
                         <div>
                           <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text-primary)", marginBottom: 2 }}>{n.title}</div>
                           <div style={{ fontSize: 11.5, color: "var(--text-secondary)", lineHeight: 1.4 }}>{n.message}</div>
-                          <div style={{ fontSize: 10.5, color: "var(--text-muted)", marginTop: 4 }}>{n.created_at ? new Date(n.created_at).toLocaleDateString("id-ID") : ""}</div>
+                          <div style={{ fontSize: 10.5, color: "var(--text-muted)", marginTop: 4 }}>{n.created_at ? new Date(n.created_at).toLocaleDateString(lang === "id" ? "id-ID" : "en-US") : ""}</div>
                         </div>
                         {n.read === 0 && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--text-primary)", flexShrink: 0, marginTop: 4 }} />}
                       </div>
@@ -201,8 +205,8 @@ export default function Topbar({ title, subtitle, onToggleSidebar }: TopbarProps
               </div>
               {[
                 { label: "Dashboard", href: user?.role === "admin" ? "/dashboard" : user?.role === "umkm" ? "/umkm" : "/buyer", icon: "◈" },
-                { label: "Profil Saya", href: "#", icon: "⬡" },
-                { label: "Pengaturan", href: "#", icon: "⚙" },
+                { label: lang === "id" ? "Profil Saya" : "My Profile", href: "#", icon: "⬡" },
+                { label: lang === "id" ? "Pengaturan" : "Settings", href: "#", icon: "⚙" },
               ].map(item => (
                 <button key={item.label} onClick={() => router.push(item.href)} style={{ width: "100%", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, color: "var(--text-secondary)", fontSize: 13, textAlign: "left", transition: "background 0.2s" }}
                   onMouseOver={e => (e.currentTarget as HTMLButtonElement).style.background = "var(--bg-hover)"}
@@ -215,7 +219,7 @@ export default function Topbar({ title, subtitle, onToggleSidebar }: TopbarProps
                   onMouseOver={e => (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.06)"}
                   onMouseOut={e => (e.currentTarget as HTMLButtonElement).style.background = "none"}
                   id="logout-btn">
-                  <span style={{ width: 16 }}>⎋</span> Keluar
+                  <span style={{ width: 16 }}>⎋</span> {t("auth.logout") || (lang === "id" ? "Keluar" : "Sign Out")}
                 </button>
               </div>
             </div>

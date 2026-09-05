@@ -56,7 +56,14 @@ conn = mysql.connector.connect(
 cursor = conn.cursor(dictionary=True)
 
 # 3. Read JSON
-with open('dataset_35.json', 'r') as f:
+script_dir = os.path.dirname(os.path.abspath(__file__))
+json_path = os.path.join(script_dir, '..', 'data', 'dataset_35.json')
+if not os.path.exists(json_path):
+    json_path = os.path.join(script_dir, '..', 'dataset_35.json')
+if not os.path.exists(json_path):
+    json_path = 'dataset_35.json'
+
+with open(json_path, 'r', encoding='utf-8') as f:
     dataset = json.load(f)
 
 print(f"Loaded {len(dataset)} items from JSON")

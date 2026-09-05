@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { ethers } from "ethers";
 import crypto from "crypto";
 import { checkEnvOnStartup } from "./env-check";
+import { CURATED_DEMO_PRODUCTS } from "./product-utils";
 
 // =====================================================================
 // WALLET ENCRYPTION (AES-256-CBC)
@@ -443,46 +444,76 @@ async function seedDemoData(pool: PoolInterface) {
   `;
 
   await pool.query(insertProduct, [
-    umkm1Profile.insertId, "Jamu Kunyit Asam Premium", "Jamu",
-    "Jamu kunyit asam botol kaca 500ml, terbuat dari kunyit pilihan dan asam jawa alami.",
-    45000, 2.8, 1000, "botol", "/products/kunyit-asam.jpg",
-    generateTxHash(), '["BPOM","Halal"]', "active",
+    umkm1Profile.insertId, "Jamu Kunyit Asam Sirih Keraton", "Jamu Tradisional",
+    "Ramuan jamu kunyit asam warisan keraton Jawa dengan perpaduan sirih merah, kunyit induk organik, dan asam jawa matang pohon. Diproses cold-pressed tanpa pengawet untuk merawat pencernaan dan detoksifikasi tubuh.",
+    65000, 4.2, 850, "botol (350ml)", "/images/products/kunyit_asam_keraton.png",
+    generateTxHash(), '["BPOM TR213645011","Halal MUI","CPOTB Grade A"]', "active",
   ]);
   await pool.query(insertProduct, [
-    umkm1Profile.insertId, "Ekstrak Temulawak", "Bahan Baku",
-    "Ekstrak temulawak murni 1kg, kualitas farmasi untuk produksi obat herbal.",
-    120000, 7.5, 500, "kg", "/products/temulawak.jpg",
-    generateTxHash(), '["CPOTB"]', "active",
+    umkm2Profile.insertId, "Beras Kencur Wangi Solo Imperial", "Jamu Tradisional",
+    "Racikan beras kencur premium khas Solo dengan kencur wangi lereng Gunung Lawu, beras ketan pilihan, jahe merah, kayu manis, dan madu hutan. Memulihkan stamina, meredakan lelah, dan menghangatkan tubuh.",
+    58000, 3.8, 620, "botol (250ml)", "/images/products/beras_kencur_imperial.png",
+    generateTxHash(), '["BPOM TR203639881","Halal MUI","HACCP"]', "active",
   ]);
   await pool.query(insertProduct, [
-    umkm1Profile.insertId, "Teh Herbal Jahe Merah", "Minuman Herbal",
-    "Teh celup jahe merah isi 20 sachet, menghangatkan dan menyehatkan tubuh.",
-    35000, 2.2, 2500, "box", "/products/jahe-merah.jpg",
-    generateTxHash(), '["BPOM","SNI"]', "active",
+    umkm1Profile.insertId, "Temulawak Curcumin Gold Signature", "Ekstrak Herbal",
+    "Kapsul ekstrak temulawak murni standar farmasi dengan konsentrasi kurkuminoid 95%. Dirancang khusus untuk memelihara fungsi hati (liver), mengoptimalkan metabolisme, dan meningkatkan imunitas.",
+    145000, 9.5, 430, "botol (60 kapsul)", "/images/products/temulawak_curcumin.png",
+    generateTxHash(), '["BPOM TR193331521","Halal MUI","ISO 9001","CPOTB"]', "active",
   ]);
   await pool.query(insertProduct, [
-    umkm1Profile.insertId, "Minyak Angin Aromaterapi", "Obat Luar",
-    "Minyak angin roll-on dengan campuran aromaterapi lavender dan eucalyptus.",
-    25000, 1.6, 5000, "botol", "/products/minyak-angin.jpg",
-    generateTxHash(), '["BPOM"]', "active",
+    umkm1Profile.insertId, "Minyak Balur 69 Rempah Heritage", "Minyak Atsiri",
+    "Minyak balur terapi holistik warisan nusantara yang diramu dari 69 jenis rempah-rempah berkhasiat termasuk adas, cengkeh, gaharu, dan VCO. Meredakan pegal linu, rematik, serta melancarkan energi tubuh.",
+    185000, 12.0, 510, "botol (100ml)", "/images/products/minyak_balur_69.png",
+    generateTxHash(), '["BPOM QD183616611","Halal MUI","Cruelty-Free"]', "active",
   ]);
   await pool.query(insertProduct, [
-    umkm2Profile.insertId, "Kapsul Habbatussauda", "Suplemen",
-    "Kapsul habbatussauda (jintan hitam) 60 kapsul untuk daya tahan tubuh.",
-    75000, 4.7, 800, "botol", "/products/habbatussauda.jpg",
-    generateTxHash(), '["BPOM","Halal"]', "active",
+    umkm2Profile.insertId, "Kapsul Ekstrak Purwoceng Dieng Reserve", "Ekstrak Herbal",
+    "Ekstrak akar Purwoceng endemik Dataran Tinggi Dieng 2000 mdpl. Dikenal sebagai ginseng Jawa legendaris untuk vitalitas pria, daya tahan tubuh prima, dan sirkulasi darah mikro.",
+    225000, 14.5, 340, "canister (60 kapsul)", "/images/products/purwoceng_dieng.png",
+    generateTxHash(), '["BPOM TR213388711","Halal MUI","Organik Indonesia"]', "active",
   ]);
   await pool.query(insertProduct, [
-    umkm2Profile.insertId, "Sirup Herbal Pegagan", "Minuman Herbal",
-    "Sirup pegagan 250ml untuk meningkatkan konsentrasi dan daya ingat.",
-    55000, 3.4, 600, "botol", "/products/pegagan.jpg",
-    generateTxHash(), '["BPOM","SNI"]', "active",
+    umkm1Profile.insertId, "Elixir Galian Singset Ratu Madura", "Jamu Tradisional",
+    "Formula jamu galian singset ningrat Madura berbasis majakani, kayu rapet, daun sirih, dan kunci pepet. Merawat kesehatan kewanitaan, mengencangkan otot tubuh, dan menjaga kebugaran alami.",
+    95000, 6.2, 480, "botol (250ml)", "/images/products/galian_singset_madura.png",
+    generateTxHash(), '["BPOM TR203641291","Halal MUI","CPOTB"]', "active",
   ]);
   await pool.query(insertProduct, [
-    umkm2Profile.insertId, "Salep Herbal Kencur", "Obat Luar",
-    "Salep kencur tradisional 50g untuk pegal linu dan nyeri otot.",
-    30000, 1.9, 1200, "tube", "/products/salep-kencur.jpg",
-    generateTxHash(), '["BPOM"]', "active",
+    umkm2Profile.insertId, "Kapsul Habbatussauda & Propolis Trigona", "Ekstrak Herbal",
+    "Sinergi habbatussauda cold-pressed murni dan ekstrak propolis lebah tanpa sengat Trigona. Kaya antioksidan thymoquinone untuk perlindungan imunitas seluler dan daya tahan tubuh maksimal.",
+    115000, 7.5, 650, "botol (60 kapsul)", "/images/products/habbatussauda.png",
+    generateTxHash(), '["BPOM TR193325601","Halal MUI","GMP Certified"]', "active",
+  ]);
+  await pool.query(insertProduct, [
+    umkm1Profile.insertId, "Teh Herbal Bunga Telang & Serai Wangi", "Teh & Seduhan",
+    "Teh celup piramida bunga telang organik dipadu serai wangi dan daun pandan tropis. Menghasilkan seduhan biru safir alami kaya antosianin untuk relaksasi mendalam dan kesehatan mata.",
+    55000, 3.6, 720, "pouch (20 sachet)", "/images/products/teh.png",
+    generateTxHash(), '["BPOM RI MD 267911001","Halal MUI","Rainforest Certified"]', "active",
+  ]);
+  await pool.query(insertProduct, [
+    umkm2Profile.insertId, "Lulur Rempah Mangir Kuning Kasultanan", "Perawatan Tubuh",
+    "Lulur mandi tradisional putri keraton berbahan rimpang temu giring, kunyit kasturi, cendana wangi, dan serbuk beras. Mencerahkan kulit, mengangkat sel mati, dan mengharumkan tubuh semerbak rempah.",
+    78000, 5.1, 590, "jar (200g)", "/images/products/salep_kencur.png",
+    generateTxHash(), '["BPOM NA18210700542","Halal MUI","CPKB"]', "active",
+  ]);
+  await pool.query(insertProduct, [
+    umkm1Profile.insertId, "Minyak Kayu Putih Asli Ambon Grade A", "Minyak Atsiri",
+    "Minyak kayu putih murni hasil penyulingan tradisional daun kayu putih Pulau Buru, Ambon. Memiliki kadar sineol tinggi dengan kehangatan tahan lama untuk melegakan pernapasan dan kembung.",
+    88000, 5.8, 830, "botol (100ml)", "/images/products/minyak.png",
+    generateTxHash(), '["BPOM TR185612341","Halal MUI","Indikasi Geografis"]', "active",
+  ]);
+  await pool.query(insertProduct, [
+    umkm1Profile.insertId, "Ekstrak Sambiloto King of Bitters Ultra", "Ekstrak Herbal",
+    "Ekstrak daun sambiloto terstandarisasi andrographolide murni. Terkenal sebagai King of Bitters untuk meredakan radang tenggorokan, menurunkan demam, dan detoksifikasi alami tubuh.",
+    110000, 7.2, 410, "botol (60 kapsul)", "/images/products/kapsul.png",
+    generateTxHash(), '["BPOM TR213354921","Halal MUI","CPOTB"]', "active",
+  ]);
+  await pool.query(insertProduct, [
+    umkm2Profile.insertId, "Sirup Herbal Daun Pegagan Brahmi Jawa", "Jamu Tradisional",
+    "Sirup pekat ekstrak daun pegagan liar berkhasiat nootropik alami yang diperkaya madu randu dan lemon. Membantu daya konsentrasi, sirkulasi otak, serta meredakan kecemasan pikiran.",
+    75000, 4.9, 540, "botol (250ml)", "/images/products/minuman.png",
+    generateTxHash(), '["BPOM TR213658931","Halal MUI","SNI Organik"]', "active",
   ]);
 
   // Transactions
@@ -672,50 +703,76 @@ export async function getProducts(options?: {
   limit?: number;
   offset?: number;
 }) {
-  const pool = await getDb();
-  let sql =
-    "SELECT p.*, u.business_name as umkm_name, us.wallet_address as umkm_wallet FROM products p LEFT JOIN umkm_profiles u ON p.umkm_profile_id = u.id LEFT JOIN users us ON u.user_id = us.id WHERE 1=1";
-  const params: unknown[] = [];
+  try {
+    const pool = await getDb();
+    let sql =
+      "SELECT p.*, u.business_name as umkm_name, us.wallet_address as umkm_wallet FROM products p LEFT JOIN umkm_profiles u ON p.umkm_profile_id = u.id LEFT JOIN users us ON u.user_id = us.id WHERE 1=1";
+    const params: unknown[] = [];
 
-  if (options?.umkmProfileId) {
-    sql += " AND p.umkm_profile_id = ?";
-    params.push(options.umkmProfileId);
-  }
-  if (options?.category) {
-    sql += " AND p.category = ?";
-    params.push(options.category);
-  }
-  if (options?.search) {
-    sql += " AND (p.name LIKE ? OR p.description LIKE ?)";
-    params.push(`%${options.search}%`, `%${options.search}%`);
-  }
-  if (options?.status) {
-    sql += " AND p.status = ?";
-    params.push(options.status);
-  }
-
-  sql += " ORDER BY p.created_at DESC";
-
-  if (options?.limit) {
-    sql += " LIMIT ?";
-    params.push(options.limit);
-    if (options?.offset) {
-      sql += " OFFSET ?";
-      params.push(options.offset);
+    if (options?.umkmProfileId) {
+      sql += " AND p.umkm_profile_id = ?";
+      params.push(options.umkmProfileId);
     }
-  }
+    if (options?.category) {
+      sql += " AND p.category = ?";
+      params.push(options.category);
+    }
+    if (options?.search) {
+      sql += " AND (p.name LIKE ? OR p.description LIKE ?)";
+      params.push(`%${options.search}%`, `%${options.search}%`);
+    }
+    if (options?.status) {
+      sql += " AND p.status = ?";
+      params.push(options.status);
+    }
 
-  const [rows] = await pool.query<RowDataPacket[]>(sql, params);
-  return rows;
+    sql += " ORDER BY p.created_at DESC";
+
+    if (options?.limit) {
+      sql += " LIMIT ?";
+      params.push(options.limit);
+      if (options?.offset) {
+        sql += " OFFSET ?";
+        params.push(options.offset);
+      }
+    }
+
+    const [rows] = await pool.query<RowDataPacket[]>(sql, params);
+    return rows;
+  } catch (err) {
+    console.warn("MySQL database not ready, falling back to curated products:", (err as Error).message);
+    let list = [...CURATED_DEMO_PRODUCTS];
+    if (options?.category) {
+      list = list.filter((p) => p.category === options.category);
+    }
+    if (options?.search) {
+      const q = options.search.toLowerCase();
+      list = list.filter(
+        (p) => String(p.name).toLowerCase().includes(q) || String(p.description).toLowerCase().includes(q)
+      );
+    }
+    if (options?.status) {
+      list = list.filter((p) => p.status === options.status);
+    }
+    if (options?.umkmProfileId) {
+      list = list.filter((p) => p.umkm_profile_id === options.umkmProfileId);
+    }
+    return list as unknown as RowDataPacket[];
+  }
 }
 
 export async function getProductById(id: number) {
-  const pool = await getDb();
-  const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT p.*, u.business_name as umkm_name, us.wallet_address as umkm_wallet, us.id as umkm_user_id FROM products p LEFT JOIN umkm_profiles u ON p.umkm_profile_id = u.id LEFT JOIN users us ON u.user_id = us.id WHERE p.id = ?",
-    [id]
-  );
-  return rows[0] || null;
+  try {
+    const pool = await getDb();
+    const [rows] = await pool.query<RowDataPacket[]>(
+      "SELECT p.*, u.business_name as umkm_name, us.wallet_address as umkm_wallet, us.id as umkm_user_id FROM products p LEFT JOIN umkm_profiles u ON p.umkm_profile_id = u.id LEFT JOIN users us ON u.user_id = us.id WHERE p.id = ?",
+      [id]
+    );
+    return rows[0] || null;
+  } catch (err) {
+    console.warn("MySQL database not ready, falling back to curated product:", (err as Error).message);
+    return (CURATED_DEMO_PRODUCTS.find((p) => p.id === id) || null) as unknown as RowDataPacket;
+  }
 }
 
 export async function createProduct(data: {

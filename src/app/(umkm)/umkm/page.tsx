@@ -19,7 +19,7 @@ const emptyProduct = { name: "", category: "Jamu", description: "", priceIdr: 0,
 
 export default function UmkmDashboard() {
   const { user } = useAuth();
-  const { t, lang } = useLanguage();
+  const { t, lang, formatCurrency, formatDate } = useLanguage();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [txs, setTxs] = useState<Tx[]>([]);
@@ -47,16 +47,19 @@ export default function UmkmDashboard() {
         fetch("/api/documents", { cache: "no-store" }).then(r => r.json()),
       ]);
       setProfile(p); setProducts(Array.isArray(pr) ? pr : []); setTxs(Array.isArray(t) ? t : []); setDocuments(Array.isArray(d) ? d : []);
-    } catch { toast.error("Gagal memuat data"); }
+    } catch { toast.error(lang === "id" ? "Gagal memuat data" : "Failed to load data"); }
     setLoading(false);
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
   const copyAddress = () => {
-    if (profile?.wallet_address) { navigator.clipboard.writeText(profile.wallet_address); toast.success("Alamat wallet disalin"); }
+    if (profile?.wallet_address) { 
+      navigator.clipboard.writeText(profile.wallet_address); 
+      toast.success(lang === "id" ? "Alamat wallet disalin" : "Wallet address copied"); 
+    }
   };
 
   const openTracking = async (txId: number) => {
@@ -67,7 +70,7 @@ export default function UmkmDashboard() {
       const data = await res.json();
       setTrackingEvents(Array.isArray(data) ? data : []);
     } catch {
-      toast.error("Gagal memuat tracking");
+      toast.error(lang === "id" ? "Gagal memuat tracking" : "Failed to load tracking");
     }
     setTrackingLoading(false);
   };
@@ -79,33 +82,36 @@ export default function UmkmDashboard() {
   };
 
   const handleSave = async () => {
-    if (!form.name.trim()) { toast.error("Nama produk wajib diisi"); return; }
+    if (!form.name.trim()) { 
+      toast.error(lang === "id" ? "Nama produk wajib diisi" : "Product name is required"); 
+      return; 
+    }
     setSaving(true);
     try {
       if (editId) {
         await fetch(`/api/products/${editId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name, category: form.category, description: form.description, price_idr: form.priceIdr, price_usd: form.priceUsd, stock: form.stock, unit: form.unit, imageUrl: form.imageUrl }) });
-        toast.success("Produk diperbarui");
+        toast.success(lang === "id" ? "Produk diperbarui" : "Product updated");
       } else {
         await fetch("/api/products", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-        toast.success("Produk ditambahkan");
+        toast.success(lang === "id" ? "Produk ditambahkan" : "Product added");
       }
       setShowModal(false); loadData();
-    } catch { toast.error("Gagal menyimpan"); }
+    } catch { toast.error(lang === "id" ? "Gagal menyimpan" : "Failed to save"); }
     setSaving(false);
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Ajukan penghapusan produk ini ke Admin?")) return;
+    if (!confirm(lang === "id" ? "Ajukan penghapusan produk ini ke Admin?" : "Submit product deletion request to Admin?")) return;
     try {
       const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("Pengajuan hapus dikirim ke Admin");
+        toast.success(lang === "id" ? "Pengajuan hapus dikirim ke Admin" : "Deletion request submitted to Admin");
       } else {
-        toast.error("Gagal mengajukan penghapusan");
+        toast.error(lang === "id" ? "Gagal mengajukan penghapusan" : "Failed to submit deletion request");
       }
       loadData();
     } catch {
-      toast.error("Error jaringan");
+      toast.error(lang === "id" ? "Error jaringan" : "Network error");
     }
   };
 
@@ -113,7 +119,7 @@ export default function UmkmDashboard() {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    toast.loading("Mengunggah gambar...", { id: "upload" });
+    toast.loading(lang === "id" ? "Mengunggah gambar..." : "Uploading image...", { id: "upload" });
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -123,19 +129,19 @@ export default function UmkmDashboard() {
       
       if (data.url) {
         setForm(prev => ({ ...prev, imageUrl: data.url }));
-        toast.success("Gambar berhasil diunggah", { id: "upload" });
+        toast.success(lang === "id" ? "Gambar berhasil diunggah" : "Image uploaded successfully", { id: "upload" });
       } else {
         throw new Error(data.error);
       }
     } catch {
-      toast.error("Gagal mengunggah gambar", { id: "upload" });
+      toast.error(lang === "id" ? "Gagal mengunggah gambar" : "Failed to upload image", { id: "upload" });
     }
   };
 
   const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    toast.loading("Mengunggah berkas...", { id: "doc-upload" });
+    toast.loading(lang === "id" ? "Mengunggah berkas..." : "Uploading document...", { id: "doc-upload" });
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -143,34 +149,40 @@ export default function UmkmDashboard() {
       const data = await res.json();
       if (data.url) {
         setDocForm(prev => ({ ...prev, url: data.url }));
-        toast.success("Berkas berhasil diunggah", { id: "doc-upload" });
+        toast.success(lang === "id" ? "Berkas berhasil diunggah" : "Document uploaded successfully", { id: "doc-upload" });
       } else throw new Error(data.error);
-    } catch { toast.error("Gagal mengunggah berkas", { id: "doc-upload" }); }
+    } catch { toast.error(lang === "id" ? "Gagal mengunggah berkas" : "Failed to upload document", { id: "doc-upload" }); }
   };
 
   const handleSaveDoc = async () => {
-    if (!docForm.url) { toast.error("Harap unggah file terlebih dahulu"); return; }
+    if (!docForm.url) { 
+      toast.error(lang === "id" ? "Harap unggah file terlebih dahulu" : "Please upload a file first"); 
+      return; 
+    }
     setSaving(true);
     try {
       const res = await fetch("/api/documents", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ documentType: docForm.type, fileUrl: docForm.url }) });
-      if (res.ok) { toast.success("Berkas dikirim untuk diverifikasi"); setShowDocModal(false); loadData(); }
-      else { toast.error("Gagal mengirim berkas"); }
-    } catch { toast.error("Gagal mengirim berkas"); }
+      if (res.ok) { 
+        toast.success(lang === "id" ? "Berkas dikirim untuk diverifikasi" : "Document submitted for verification"); 
+        setShowDocModal(false); 
+        loadData(); 
+      }
+      else { toast.error(lang === "id" ? "Gagal mengirim berkas" : "Failed to submit document"); }
+    } catch { toast.error(lang === "id" ? "Gagal mengirim berkas" : "Failed to submit document"); }
     setSaving(false);
   };
 
   const handleDeleteDoc = async (id: number) => {
-    if (!confirm("Hapus berkas ini?")) return;
+    if (!confirm(lang === "id" ? "Hapus berkas ini?" : "Delete this document?")) return;
     await fetch(`/api/documents/${id}`, { method: "DELETE" });
-    toast.success("Berkas dihapus"); loadData();
+    toast.success(lang === "id" ? "Berkas dihapus" : "Document deleted"); 
+    loadData();
   };
 
-  const fmtCurrency = (v: number) => new Intl.NumberFormat("id-ID").format(v);
   const truncate = (s: string, n: number = 12) => s ? s.slice(0, n) + "..." + s.slice(-4) : "-";
-  const fmtDate = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
 
   const handleUpdateTracking = async (id: number, status: string, location: string) => {
-    toast.loading("Memperbarui status...", { id: "track" });
+    toast.loading(lang === "id" ? "Memperbarui status..." : "Updating status...", { id: "track" });
     try {
       const res = await fetch("/api/tracking", {
         method: "POST",
@@ -178,20 +190,20 @@ export default function UmkmDashboard() {
         body: JSON.stringify({ transactionId: id, status, location })
       });
       if (res.ok) {
-        toast.success(`Status diperbarui menjadi ${status}`, { id: "track" });
+        toast.success(lang === "id" ? `Status diperbarui menjadi ${status}` : `Status updated to ${status}`, { id: "track" });
         loadData();
       } else {
         const data = await res.json();
-        toast.error(data.error || "Gagal", { id: "track" });
+        toast.error(data.error || (lang === "id" ? "Gagal" : "Failed"), { id: "track" });
       }
     } catch {
-      toast.error("Error jaringan", { id: "track" });
+      toast.error(lang === "id" ? "Error jaringan" : "Network error", { id: "track" });
     }
   };
 
   if (loading) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "80vh", color: "var(--text-secondary)" }}>
-      <div style={{ textAlign: "center" }}><div style={{ fontSize: 32, marginBottom: 12, animation: "spin 1s linear infinite" }}>⟳</div><div>Memuat dashboard...</div></div>
+      <div style={{ textAlign: "center" }}><div style={{ fontSize: 32, marginBottom: 12, animation: "spin 1s linear infinite" }}>⟳</div><div>{t("common.loading")}</div></div>
     </div>
   );
 
@@ -220,11 +232,11 @@ export default function UmkmDashboard() {
           <div style={{ display: "flex", gap: 24 }}>
             <div>
               <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 4 }}>{lang === "id" ? "Saldo IDR" : "IDR Balance"}</div>
-              <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Rp {fmtCurrency(profile?.balance_idr || 0)}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{formatCurrency(profile?.balance_idr || 0, "IDR")}</div>
             </div>
             <div>
               <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 4 }}>{lang === "id" ? "Saldo USD" : "USD Balance"}</div>
-              <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$ {fmtCurrency(profile?.balance_usd || 0)}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{formatCurrency(profile?.balance_usd || 0, "USD")}</div>
             </div>
           </div>
         </div>
@@ -271,13 +283,13 @@ export default function UmkmDashboard() {
                           <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#eab308", color: "#fff", fontWeight: 600 }}>Pending</span>
                         )}
                         {p.status === "rejected" && (
-                          <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "var(--bg-tertiary)", color: "var(--text-secondary)", fontWeight: 600, border: "1px solid var(--border-color)" }}>Ditolak</span>
+                          <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "var(--bg-tertiary)", color: "var(--text-secondary)", fontWeight: 600, border: "1px solid var(--border-color)" }}>{lang === "id" ? "Ditolak" : "Rejected"}</span>
                         )}
                         {p.status === "delete_pending" && (
-                          <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#ef4444", color: "#fff", fontWeight: 600 }}>Menunggu Hapus</span>
+                          <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#ef4444", color: "#fff", fontWeight: 600 }}>{lang === "id" ? "Menunggu Hapus" : "Pending Deletion"}</span>
                         )}
                         {p.status === "inactive" && (
-                          <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#6b7280", color: "#fff", fontWeight: 600 }}>Dihapus (Inactive)</span>
+                          <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#6b7280", color: "#fff", fontWeight: 600 }}>{lang === "id" ? "Dihapus (Inactive)" : "Deleted (Inactive)"}</span>
                         )}
                       </div>
                     </div>
@@ -292,12 +304,12 @@ export default function UmkmDashboard() {
                 <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12, lineHeight: 1.5 }}>{p.description?.slice(0, 80)}{p.description?.length > 80 ? "..." : ""}</p>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text-primary)" }}>Rp {fmtCurrency(p.price_idr)}</div>
-                    <div style={{ fontSize: 11, color: "var(--text-muted)" }}>$ {p.price_usd}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text-primary)" }}>{formatCurrency(p.price_idr, "IDR")}</div>
+                    <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{formatCurrency(p.price_usd, "USD")}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{p.stock} {p.unit}</div>
-                    <div style={{ fontSize: 10, color: "var(--text-muted)" }}>stok tersedia</div>
+                    <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{lang === "id" ? "stok tersedia" : "in stock"}</div>
                   </div>
                 </div>
               </div>
@@ -309,12 +321,14 @@ export default function UmkmDashboard() {
       {/* Pesanan Masuk (Incoming Orders) */}
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: "var(--text-primary)" }}>Pesanan Masuk</h2>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: "var(--text-primary)" }}>
+            {lang === "id" ? "Pesanan Masuk" : "Incoming Orders"}
+          </h2>
         </div>
 
         {txs.filter(t => t.type === 'purchase' && t.to_name === user?.name).length === 0 ? (
           <div style={{ padding: 48, textAlign: "center", background: "var(--bg-card)", borderRadius: 12, border: "1px solid var(--border-color)", color: "var(--text-muted)" }}>
-            <div>Belum ada pesanan masuk.</div>
+            <div>{lang === "id" ? "Belum ada pesanan masuk." : "No incoming orders yet."}</div>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -322,31 +336,31 @@ export default function UmkmDashboard() {
               <div key={order.id} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 12, padding: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>{order.product_name}</div>
-                  <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>Dari: {order.from_name} • {fmtDate(order.created_at)}</div>
+                  <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{lang === "id" ? "Dari:" : "From:"} {order.from_name} • {formatDate(order.created_at)}</div>
                   <div style={{ fontSize: 14, fontWeight: 600, marginTop: 8, color: "var(--text-primary)" }}>
-                    {order.currency === 'IDR' ? `Rp ${fmtCurrency(order.amount)}` : `$ ${order.amount} USDT`}
+                    {order.currency === 'IDR' ? formatCurrency(order.amount, 'IDR') : formatCurrency(order.amount, 'USD')}
                   </div>
                 </div>
                 <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
                      <span style={{ fontSize: 11, padding: "4px 8px", borderRadius: 6, fontWeight: 700, background: order.tracking_status === "Pesanan Dibuat" ? "#eab308" : (order.tracking_status === "Pesanan Diterima" ? "#22c55e" : "#475569"), color: "#ffffff" }}>
-                       {order.tracking_status === "Pesanan Dibuat" ? "Menunggu Diproses" : (order.tracking_status || order.status)}
+                       {order.tracking_status === "Pesanan Dibuat" ? (lang === "id" ? "Menunggu Diproses" : "Awaiting Processing") : (order.tracking_status || order.status)}
                      </span>
                      <button onClick={() => (window as unknown as { openTrustChainChat?: (id: number) => void }).openTrustChainChat?.(3)} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(59,130,246,0.15)", color: "#3b82f6", border: "1px solid rgba(59,130,246,0.3)", cursor: "pointer", fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
-                       💬 Chat Pembeli
+                       {lang === "id" ? "💬 Chat Pembeli" : "💬 Chat Buyer"}
                      </button>
                      <button onClick={() => openTracking(order.id)} style={{ padding: "4px 8px", borderRadius: 6, background: "transparent", color: "var(--text-primary)", border: "1px solid var(--border-color)", cursor: "pointer", fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
-                       <Package size={12} /> Lacak
+                       <Package size={12} /> {lang === "id" ? "Lacak" : "Track"}
                      </button>
                    </div>
                    {order.tracking_status === "Pesanan Dibuat" && (
                      <button onClick={() => handleUpdateTracking(order.id, "Pesanan Diproses", "Gudang UMKM")} style={{ padding: "8px 16px", borderRadius: 8, background: "#000", color: "#fff", border: "1px solid #000", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
-                       Konfirmasi Pesanan
+                       {lang === "id" ? "Konfirmasi Pesanan" : "Confirm Order"}
                      </button>
                    )}
                    {order.tracking_status === "Pesanan Diproses" && (
                      <button onClick={() => handleUpdateTracking(order.id, "Dikemas", "Fasilitas Pengemasan UMKM")} style={{ padding: "8px 16px", borderRadius: 8, background: "transparent", color: "#000", border: "1px solid #000", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
-                       Pesanan Dipacking
+                       {lang === "id" ? "Pesanan Dipacking" : "Pack Order"}
                      </button>
                    )}
                 </div>
@@ -373,7 +387,7 @@ export default function UmkmDashboard() {
         {documents.length === 0 ? (
           <div style={{ padding: 48, textAlign: "center", background: "var(--bg-card)", borderRadius: 12, border: "1px solid var(--border-color)", color: "var(--text-muted)" }}>
             <FileText size={40} style={{ marginBottom: 12, opacity: 0.3 }} />
-            <div>Belum ada berkas. Unggah dokumen pendukung untuk diverifikasi.</div>
+            <div>{lang === "id" ? "Belum ada berkas. Unggah dokumen pendukung untuk diverifikasi." : "No documents yet. Upload verification documents."}</div>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
@@ -386,7 +400,7 @@ export default function UmkmDashboard() {
                     </div>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{d.document_type}</div>
-                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{fmtDate(d.created_at)}</div>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{formatDate(d.created_at)}</div>
                     </div>
                   </div>
                   {d.status === 'pending' && <button onClick={() => handleDeleteDoc(d.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-secondary)" }}><Trash2 size={16} /></button>}
@@ -394,7 +408,7 @@ export default function UmkmDashboard() {
                 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border-subtle)" }}>
                   <a href={d.file_url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "var(--text-primary)", fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
-                    Lihat Berkas <ArrowUpRight size={12} />
+                    {lang === "id" ? "Lihat Berkas" : "View Document"} <ArrowUpRight size={12} />
                   </a>
                   <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: d.status === "approved" ? "#34d399" : d.status === "rejected" ? "#ef4444" : "#fbbf24" }}>
                     {d.status === "approved" && <CheckCircle size={14} />}
@@ -411,12 +425,17 @@ export default function UmkmDashboard() {
 
       {/* Transaction History */}
       <div style={{ background: "var(--bg-card)", borderRadius: 12, border: "1px solid var(--border-color)", overflow: "hidden" }}>
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-color)", fontWeight: 700, fontSize: 15, color: "var(--text-primary)" }}>Riwayat Transaksi</div>
+        <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-color)", fontWeight: 700, fontSize: 15, color: "var(--text-primary)" }}>
+          {lang === "id" ? "Riwayat Transaksi" : "Transaction History"}
+        </div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border-color)" }}>
-                {["Tx Hash", "Dari", "Ke", "Produk", "Jumlah", "Tipe", "Tanggal", "Aksi"].map(h => (
+                {(lang === "id"
+                  ? ["Tx Hash", "Dari", "Ke", "Produk", "Jumlah", "Tipe", "Tanggal", "Aksi"]
+                  : ["Tx Hash", "From", "To", "Product", "Amount", "Type", "Date", "Action"]
+                ).map(h => (
                   <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "var(--text-secondary)", fontWeight: 600, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.06em" }}>{h}</th>
                 ))}
               </tr>
@@ -432,20 +451,22 @@ export default function UmkmDashboard() {
                   <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{t.from_name || "-"}</td>
                   <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{t.to_name || "-"}</td>
                   <td style={{ padding: "12px 16px", color: "var(--text-primary)", fontWeight: 500 }}>{t.product_name || "-"}</td>
-                  <td style={{ padding: "12px 16px", fontWeight: 600, color: "var(--text-primary)" }}>{t.currency === "USD" ? "$" : "Rp"} {fmtCurrency(t.amount)}</td>
+                  <td style={{ padding: "12px 16px", fontWeight: 600, color: "var(--text-primary)" }}>
+                    {t.currency === "USD" ? formatCurrency(t.amount, "USD") : formatCurrency(t.amount, "IDR")}
+                  </td>
                   <td style={{ padding: "12px 16px" }}><span style={{ padding: "3px 8px", borderRadius: 4, fontSize: 10, fontWeight: 700, background: "var(--bg-tertiary)", border: "1px solid var(--border-color)", textTransform: "uppercase" }}>{t.type}</span></td>
-                  <td style={{ padding: "12px 16px", color: "var(--text-muted)", fontSize: 12 }}>{t.created_at ? fmtDate(t.created_at) : "-"}</td>
+                  <td style={{ padding: "12px 16px", color: "var(--text-muted)", fontSize: 12 }}>{t.created_at ? formatDate(t.created_at) : "-"}</td>
                   <td style={{ padding: "12px 16px" }}>
                     <button
                       onClick={() => window.open(`/verify/${t.tx_hash}`, '_blank')}
                       style={{ padding: "5px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, background: "rgba(16,185,129,0.15)", color: "#10b981", border: "1px solid rgba(16,185,129,0.3)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 }}
                     >
-                      🔍 QR Verifikasi
+                      {lang === "id" ? "🔍 QR Verifikasi" : "🔍 Verify QR"}
                     </button>
                   </td>
                 </tr>
               ))}
-              {txs.length === 0 && <tr><td colSpan={8} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>Belum ada transaksi</td></tr>}
+              {txs.length === 0 && <tr><td colSpan={8} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>{lang === "id" ? "Belum ada transaksi" : "No transactions yet"}</td></tr>}
             </tbody>
           </table>
         </div>
@@ -461,14 +482,16 @@ export default function UmkmDashboard() {
         <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
           <div style={{ background: "var(--bg-secondary)", borderRadius: 16, border: "1px solid var(--border-color)", padding: 28, width: "100%", maxWidth: 480 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>{editId ? "Edit Produk" : "Tambah Produk Baru"}</h3>
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>
+                {editId ? (lang === "id" ? "Edit Produk" : "Edit Product") : (lang === "id" ? "Tambah Produk Baru" : "Add New Product")}
+              </h3>
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-secondary)" }}><XIcon size={20} /></button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {[
-                { label: "Nama Produk", key: "name", type: "text", placeholder: "Contoh: Jamu Kunyit Asam" },
-                { label: "Kategori", key: "category", type: "text", placeholder: "Jamu, Suplemen, Obat Luar..." },
-                { label: "Deskripsi", key: "description", type: "text", placeholder: "Deskripsi produk..." },
+                { label: lang === "id" ? "Nama Produk" : "Product Name", key: "name", type: "text", placeholder: lang === "id" ? "Contoh: Jamu Kunyit Asam" : "e.g. Turmeric Jamu" },
+                { label: lang === "id" ? "Kategori" : "Category", key: "category", type: "text", placeholder: lang === "id" ? "Jamu, Suplemen, Obat Luar..." : "Herbal, Supplement, Tonic..." },
+                { label: lang === "id" ? "Deskripsi" : "Description", key: "description", type: "text", placeholder: lang === "id" ? "Deskripsi produk..." : "Product description..." },
               ].map(f => (
                 <div key={f.key}>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>{f.label}</label>
@@ -476,7 +499,9 @@ export default function UmkmDashboard() {
                 </div>
               ))}
               <div>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Gambar Produk</label>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
+                  {lang === "id" ? "Gambar Produk" : "Product Image"}
+                </label>
                 <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                   {form.imageUrl && <Image src={form.imageUrl} alt="Preview" width={40} height={40} style={{ borderRadius: 6, objectFit: "cover" }} unoptimized />}
                   <input type="file" accept="image/*" onChange={handleUpload} style={{ fontSize: 13 }} />
@@ -484,26 +509,34 @@ export default function UmkmDashboard() {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Harga IDR</label>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
+                    {lang === "id" ? "Harga IDR" : "Price IDR"}
+                  </label>
                   <input type="number" value={form.priceIdr} onChange={e => setForm(prev => ({ ...prev, priceIdr: Number(e.target.value) }))} className="custom-input" />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Harga USD</label>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
+                    {lang === "id" ? "Harga USD" : "Price USD"}
+                  </label>
                   <input type="number" value={form.priceUsd} onChange={e => setForm(prev => ({ ...prev, priceUsd: Number(e.target.value) }))} className="custom-input" />
                 </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Stok</label>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
+                    {lang === "id" ? "Stok" : "Stock"}
+                  </label>
                   <input type="number" value={form.stock} onChange={e => setForm(prev => ({ ...prev, stock: Number(e.target.value) }))} className="custom-input" />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Satuan</label>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
+                    {lang === "id" ? "Satuan" : "Unit"}
+                  </label>
                   <input value={form.unit} onChange={e => setForm(prev => ({ ...prev, unit: e.target.value }))} className="custom-input" placeholder="pcs, botol, kg..." />
                 </div>
               </div>
               <button onClick={handleSave} disabled={saving} style={{ padding: "12px 0", borderRadius: 8, background: "#000", color: "#fff", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, marginTop: 8, transition: "all 0.2s ease" }}>
-                {saving ? "Menyimpan..." : editId ? "Simpan Perubahan" : "Tambahkan Produk"}
+                {saving ? t("common.loading") : editId ? (lang === "id" ? "Simpan Perubahan" : "Save Changes") : (lang === "id" ? "Tambahkan Produk" : "Add Product")}
               </button>
             </div>
           </div>
@@ -515,28 +548,34 @@ export default function UmkmDashboard() {
         <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
           <div style={{ background: "var(--bg-secondary)", borderRadius: 16, border: "1px solid var(--border-color)", padding: 28, width: "100%", maxWidth: 400 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>Unggah Berkas Ekspor</h3>
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>
+                {lang === "id" ? "Unggah Berkas Ekspor" : "Upload Export Document"}
+              </h3>
               <button onClick={() => setShowDocModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-secondary)" }}><XIcon size={20} /></button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Tipe Dokumen</label>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
+                  {lang === "id" ? "Tipe Dokumen" : "Document Type"}
+                </label>
                 <select value={docForm.type} onChange={e => setDocForm(prev => ({ ...prev, type: e.target.value }))} className="custom-select">
-                  <option value="NIB">Nomor Induk Berusaha (NIB)</option>
-                  <option value="BPOM">Sertifikat BPOM</option>
-                  <option value="Halal">Sertifikat Halal</option>
-                  <option value="Izin Ekspor">Izin Ekspor / COO</option>
-                  <option value="KTP/NPWP">KTP / NPWP Pemilik</option>
-                  <option value="Lainnya">Lainnya</option>
+                  <option value="NIB">{lang === "id" ? "Nomor Induk Berusaha (NIB)" : "Business ID Number (NIB)"}</option>
+                  <option value="BPOM">{lang === "id" ? "Sertifikat BPOM" : "BPOM Certificate"}</option>
+                  <option value="Halal">{lang === "id" ? "Sertifikat Halal" : "Halal Certificate"}</option>
+                  <option value="Izin Ekspor">{lang === "id" ? "Izin Ekspor / COO" : "Export License / COO"}</option>
+                  <option value="KTP/NPWP">{lang === "id" ? "KTP / NPWP Pemilik" : "Owner ID / Tax Number"}</option>
+                  <option value="Lainnya">{lang === "id" ? "Lainnya" : "Other"}</option>
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>Pilih Berkas</label>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
+                  {lang === "id" ? "Pilih Berkas" : "Select File"}
+                </label>
                 <input type="file" onChange={handleDocUpload} style={{ fontSize: 13, display: "block", width: "100%", padding: 10, background: "var(--bg-tertiary)", borderRadius: 8, border: "1px dashed var(--border-color)" }} />
-                {docForm.url && <div style={{ marginTop: 8, fontSize: 12, color: "#34d399", display: "flex", alignItems: "center", gap: 4 }}><CheckCircle size={14} /> Berkas siap dikirim</div>}
+                {docForm.url && <div style={{ marginTop: 8, fontSize: 12, color: "#34d399", display: "flex", alignItems: "center", gap: 4 }}><CheckCircle size={14} /> {lang === "id" ? "Berkas siap dikirim" : "File ready to upload"}</div>}
               </div>
               <button onClick={handleSaveDoc} disabled={saving || !docForm.url} style={{ padding: "12px 0", borderRadius: 8, background: "#000", color: "#fff", border: "none", cursor: docForm.url ? "pointer" : "not-allowed", fontSize: 14, fontWeight: 700, marginTop: 8, transition: "all 0.2s ease", opacity: docForm.url ? 1 : 0.5 }}>
-                {saving ? "Mengirim..." : "Kirim untuk Verifikasi"}
+                {saving ? t("common.loading") : (lang === "id" ? "Kirim untuk Verifikasi" : "Submit for Verification")}
               </button>
             </div>
           </div>
@@ -550,15 +589,21 @@ export default function UmkmDashboard() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Package size={24} style={{ color: "var(--text-primary)" }} />
-                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>Lacak Pesanan</h3>
+                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>
+                  {lang === "id" ? "Lacak Pesanan" : "Track Order"}
+                </h3>
               </div>
               <button onClick={() => setShowTracking(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-secondary)" }}><XIcon size={20} /></button>
             </div>
 
             {trackingLoading ? (
-              <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Memuat data blockchain...</div>
+              <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>
+                {lang === "id" ? "Memuat data blockchain..." : "Loading blockchain data..."}
+              </div>
             ) : trackingEvents.length === 0 ? (
-              <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Belum ada log pelacakan.</div>
+              <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>
+                {lang === "id" ? "Belum ada log pelacakan." : "No tracking logs yet."}
+              </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 0, position: "relative" }}>
                 <div style={{ position: "absolute", left: 15, top: 20, bottom: 20, width: 2, background: "var(--border-color)", zIndex: 0 }}></div>
@@ -570,9 +615,11 @@ export default function UmkmDashboard() {
                     <div style={{ flex: 1, background: "var(--bg-card)", padding: 16, borderRadius: 12, border: "1px solid var(--border-color)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                         <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)" }}>{ev.status}</div>
-                        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{new Date(ev.created_at).toLocaleString('id-ID')}</div>
+                        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{new Date(ev.created_at).toLocaleString(lang === 'id' ? 'id-ID' : 'en-US')}</div>
                       </div>
-                      <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 8 }}>Lokasi: <strong>{ev.location}</strong></div>
+                      <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 8 }}>
+                        {lang === "id" ? "Lokasi:" : "Location:"} <strong>{ev.location}</strong>
+                      </div>
                       <div style={{ fontSize: 10, background: "rgba(0,0,0,0.03)", padding: "6px 8px", borderRadius: 4, fontFamily: "'JetBrains Mono', monospace", color: "var(--text-muted)", display: "flex", justifyContent: "space-between", border: "1px solid var(--border-subtle)" }}>
                         <span>Hash: {ev.tx_hash ? ev.tx_hash.slice(0, 20) + "..." : "-"}</span>
                         <a href={`/verify/${ev.tx_hash}`} target="_blank" rel="noopener noreferrer" style={{ color: "#10b981", textDecoration: "none", fontWeight: 600 }}>🔍 Verify On-Chain & QR</a>

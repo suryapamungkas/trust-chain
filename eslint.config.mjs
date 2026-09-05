@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "scripts/**",
     "public/**",
     "server.js",
+    "skills/**",
+    "data/**",
   ]),
 ]);
 

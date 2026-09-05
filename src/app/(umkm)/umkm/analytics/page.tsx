@@ -1,13 +1,10 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
 import { mockAIInsights } from "@/lib/database";
 import { StatusBadge } from "@/components/UIComponents";
 import { useState, useEffect } from "react";
 
 export default function UmkmAnalyticsPage() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { user } = useAuth();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [umkmProfile, setUmkmProfile] = useState<any>(null);
 

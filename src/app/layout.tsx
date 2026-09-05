@@ -40,6 +40,7 @@ export default function RootLayout({
   return (
     <html lang="id" data-theme="dark" suppressHydrationWarning>
       <head>
+        <meta name="color-scheme" content="light dark" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
@@ -54,6 +55,8 @@ export default function RootLayout({
                 try {
                   var theme = localStorage.getItem('tc_theme') || 'dark';
                   document.documentElement.setAttribute('data-theme', theme);
+                  var lang = localStorage.getItem('tc_lang') || 'id';
+                  document.documentElement.setAttribute('lang', lang);
                 } catch(e) {}
               })();
             `,

@@ -4,10 +4,12 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Lock, ArrowLeft, Loader2, CheckCircle, Eye, EyeOff } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Lock, ArrowLeft, Loader2, CheckCircle, Eye, EyeOff, Globe } from "lucide-react";
 
 function ResetPasswordForm() {
   const { theme } = useTheme();
+  const { lang, setLang } = useLanguage();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
 
@@ -21,11 +23,11 @@ function ResetPasswordForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) {
-      setError("Password tidak cocok");
+      setError(lang === "id" ? "Password tidak cocok" : "Passwords do not match");
       return;
     }
     if (password.length < 8) {
-      setError("Password minimal 8 karakter");
+      setError(lang === "id" ? "Password minimal 8 karakter" : "Password must be at least 8 characters");
       return;
     }
 
@@ -40,12 +42,12 @@ function ResetPasswordForm() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Gagal mereset password");
+        setError(data.error || (lang === "id" ? "Gagal mereset password" : "Failed to reset password"));
         return;
       }
       setSuccess(true);
     } catch {
-      setError("Gagal terhubung ke server");
+      setError(lang === "id" ? "Gagal terhubung ke server" : "Failed to connect to server");
     } finally {
       setLoading(false);
     }
@@ -62,8 +64,20 @@ function ResetPasswordForm() {
   return (
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-      background: bg, fontFamily: "'Inter', sans-serif", padding: 24,
+      background: bg, fontFamily: "'Inter', sans-serif", padding: 24, position: "relative"
     }}>
+      <div style={{ position: "absolute", top: 20, right: 24 }}>
+        <button
+          onClick={() => setLang(lang === "id" ? "en" : "id")}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 12px",
+            borderRadius: 8, background: isDark ? "#111" : "#eee", border: `1px solid ${borderColor}`,
+            color: textPrimary, cursor: "pointer", fontSize: 12, fontWeight: 600
+          }}
+        >
+          <Globe size={14} /> {lang === "id" ? "EN" : "ID"}
+        </button>
+      </div>
       <div style={{
         width: "100%", maxWidth: 420, background: cardBg,
         border: `1px solid ${borderColor}`, borderRadius: 16, padding: 40,
@@ -72,33 +86,33 @@ function ResetPasswordForm() {
           display: "inline-flex", alignItems: "center", gap: 6,
           color: textSecondary, textDecoration: "none", fontSize: 13, marginBottom: 24,
         }}>
-          <ArrowLeft size={14} /> Kembali ke Login
+          <ArrowLeft size={14} /> {lang === "id" ? "Kembali ke Login" : "Back to Login"}
         </Link>
 
         {!token ? (
           <div style={{ textAlign: "center" }}>
             <h1 style={{ fontSize: 22, fontWeight: 800, color: textPrimary, marginBottom: 12 }}>
-              Token Tidak Valid
+              {lang === "id" ? "Token Tidak Valid" : "Invalid Token"}
             </h1>
             <p style={{ fontSize: 14, color: textSecondary, marginBottom: 24 }}>
-              Link reset password tidak valid atau sudah kedaluwarsa.
+              {lang === "id" ? "Link reset password tidak valid atau sudah kedaluwarsa." : "Password reset link is invalid or has expired."}
             </p>
             <Link href="/forgot-password" style={{
               display: "inline-block", padding: "12px 28px", borderRadius: 8,
               background: textPrimary, color: isDark ? "#000" : "#fff",
               textDecoration: "none", fontSize: 14, fontWeight: 600,
             }}>
-              Minta Link Baru
+              {lang === "id" ? "Minta Link Baru" : "Request New Link"}
             </Link>
           </div>
         ) : success ? (
           <div style={{ textAlign: "center" }}>
             <CheckCircle size={48} color={textPrimary} style={{ marginBottom: 16 }} />
             <h2 style={{ fontSize: 18, fontWeight: 700, color: textPrimary, marginBottom: 8 }}>
-              Password Berhasil Direset
+              {lang === "id" ? "Password Berhasil Direset" : "Password Reset Successfully"}
             </h2>
             <p style={{ fontSize: 13, color: textSecondary, marginBottom: 24 }}>
-              Silakan login dengan password baru Anda.
+              {lang === "id" ? "Silakan login dengan password baru Anda." : "Please log in with your new password."}
             </p>
             <Link href="/login" style={{
               display: "inline-block", padding: "12px 28px", borderRadius: 8,
@@ -114,7 +128,7 @@ function ResetPasswordForm() {
               Reset Password
             </h1>
             <p style={{ fontSize: 14, color: textSecondary, marginBottom: 28 }}>
-              Masukkan password baru Anda.
+              {lang === "id" ? "Masukkan password baru Anda." : "Enter your new password."}
             </p>
             <form onSubmit={handleSubmit}>
               {error && (
@@ -127,7 +141,7 @@ function ResetPasswordForm() {
                 </div>
               )}
               <label style={{ display: "block", marginBottom: 6, fontSize: 12, fontWeight: 600, color: textSecondary }}>
-                Password Baru
+                {lang === "id" ? "Password Baru" : "New Password"}
               </label>
               <div style={{
                 display: "flex", alignItems: "center", gap: 10,
@@ -138,7 +152,7 @@ function ResetPasswordForm() {
                 <input
                   type={showPassword ? "text" : "password"} value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimal 8 karakter" required minLength={8}
+                  placeholder={lang === "id" ? "Minimal 8 karakter" : "Minimum 8 characters"} required minLength={8}
                   style={{
                     flex: 1, padding: "12px 0", background: "transparent", border: "none",
                     outline: "none", color: textPrimary, fontSize: 14,
@@ -151,7 +165,7 @@ function ResetPasswordForm() {
                 </button>
               </div>
               <label style={{ display: "block", marginBottom: 6, fontSize: 12, fontWeight: 600, color: textSecondary }}>
-                Konfirmasi Password
+                {lang === "id" ? "Konfirmasi Password" : "Confirm Password"}
               </label>
               <div style={{
                 display: "flex", alignItems: "center", gap: 10,
@@ -162,7 +176,7 @@ function ResetPasswordForm() {
                 <input
                   type={showPassword ? "text" : "password"} value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
-                  placeholder="Ulangi password baru" required minLength={8}
+                  placeholder={lang === "id" ? "Ulangi password baru" : "Repeat new password"} required minLength={8}
                   style={{
                     flex: 1, padding: "12px 0", background: "transparent", border: "none",
                     outline: "none", color: textPrimary, fontSize: 14,
@@ -174,12 +188,13 @@ function ResetPasswordForm() {
                 background: textPrimary, color: isDark ? "#000" : "#fff",
                 fontSize: 14, fontWeight: 700, cursor: loading ? "wait" : "pointer",
                 opacity: loading ? 0.7 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              }}>
-                {loading && <Loader2 size={16} className="tc-spin-icon" />}
-                {loading ? "Mereset..." : "Reset Password"}
-              </button>
-            </form>
-          </>
+              }}
+            >
+              {loading && <Loader2 size={16} className="tc-spin-icon" />}
+              {loading ? (lang === "id" ? "Mereset..." : "Resetting...") : (lang === "id" ? "Reset Password" : "Reset Password")}
+            </button>
+          </form>
+        </>
         )}
       </div>
       <style>{`

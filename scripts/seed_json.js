@@ -59,7 +59,10 @@ async function main() {
   });
 
   // 3. Read JSON
-  const dataset = JSON.parse(fs.readFileSync(path.join(__dirname, '../dataset_35.json'), 'utf8'));
+  const jsonPath = fs.existsSync(path.join(__dirname, '../data/dataset_35.json'))
+    ? path.join(__dirname, '../data/dataset_35.json')
+    : path.join(__dirname, '../dataset_35.json');
+  const dataset = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
   console.log(`Loaded ${dataset.length} items from JSON`);
 
   const defaultPassword = await bcrypt.hash('umkm123', 10);

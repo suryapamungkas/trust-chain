@@ -83,11 +83,16 @@ export default function LoginPage() {
           </div>
 
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 34, fontWeight: 800, color: "var(--text-primary)", lineHeight: 1.2, marginBottom: 16, letterSpacing: "-0.02em" }}>
-            Ekosistem Blockchain<br/>
-            <span className="gradient-text">Untuk UMKM Indonesia</span>
+            {lang === "id" ? (
+              <>Ekosistem Blockchain<br/><span className="gradient-text">Untuk UMKM Indonesia</span></>
+            ) : (
+              <>Blockchain Ecosystem<br/><span className="gradient-text">For Indonesian MSMEs</span></>
+            )}
           </h1>
           <p style={{ fontSize: 15, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 48 }}>
-            Transparansi rantai pasokan, sertifikasi digital, dan akses pasar global melalui teknologi AI & Blockchain.
+            {lang === "id"
+              ? "Transparansi rantai pasokan, sertifikasi digital, dan akses pasar global melalui teknologi AI & Blockchain."
+              : "Supply chain transparency, on-chain digital identity, and global trade access driven by AI & Web3."}
           </p>
 
           
@@ -172,7 +177,7 @@ export default function LoginPage() {
           {/* Demo Accounts */}
           <div style={{ marginBottom: 24 }}>
             <p style={{ fontSize: 11.5, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>
-              Akun Demo
+              {t("auth.demo_accounts")}
             </p>
             <div style={{ display: "flex", gap: 8 }}>
               {DEMO_ACCOUNTS.map((acc) => (
@@ -198,7 +203,7 @@ export default function LoginPage() {
 
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
             <div style={{ flex: 1, height: 1, background: "var(--border-color)" }} />
-            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>atau masuk manual</span>
+            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{t("auth.manual_or")}</span>
             <div style={{ flex: 1, height: 1, background: "var(--border-color)" }} />
           </div>
 
@@ -206,7 +211,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div>
               <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
-                Email
+                {t("auth.email")}
               </label>
               <input
                 type="email"
@@ -222,7 +227,7 @@ export default function LoginPage() {
 
             <div>
               <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6 }}>
-                Password
+                {t("auth.password")}
               </label>
               <div style={{ position: "relative" }}>
                 <input
@@ -230,7 +235,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   className="custom-input"
-                  placeholder="Masukkan password"
+                  placeholder={t("auth.enter_password")}
                   required
                   autoComplete="current-password"
                   id="login-password"
@@ -256,7 +261,7 @@ export default function LoginPage() {
                 fontSize: 12.5, color: "var(--text-secondary)", textDecoration: "none",
                 fontWeight: 500, transition: "color 0.2s",
               }}>
-                Lupa password?
+                {t("auth.forgot_password")}
               </Link>
             </div>
             {error && (
@@ -277,16 +282,16 @@ export default function LoginPage() {
               style={{ width: "100%", justifyContent: "center", marginTop: 4, padding: "13px 0" }}
             >
               {loading ? (
-                <><span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>⟳</span> Memproses...</>
+                <><span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>⟳</span> {t("common.loading")}</>
               ) : (
-                <>Masuk ke Dashboard →</>
+                <>{t("auth.sign_in_btn")}</>
               )}
             </button>
           </form>
 
           <div style={{ marginTop: 28, padding: "16px", borderRadius: 12, background: "var(--bg-tertiary)", border: "1px solid var(--border-color)" }}>
             <p style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6 }}>
-              <strong style={{ color: "var(--text-secondary)" }}>Password Demo:</strong><br/>
+              <strong style={{ color: "var(--text-secondary)" }}>{lang === "id" ? "Password Demo:" : "Demo Credentials:"}</strong><br/>
               Admin: <code style={{ color: "var(--text-primary)" }}>admin123</code> | 
               UMKM: <code style={{ color: "var(--text-primary)" }}>umkm123</code> | 
               Buyer: <code style={{ color: "var(--text-primary)" }}>buyer123</code>

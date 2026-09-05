@@ -19,7 +19,7 @@ declare global {
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const { lang, setLang } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffect = useRef<{ destroy: () => void } | null>(null);
   const [scrollY, setScrollY] = useState(0);
@@ -156,7 +156,7 @@ export default function LandingPage() {
             <button onClick={toggleTheme} className="tc-theme-btn" aria-label="Toggle theme">
               {mounted && (theme === "dark" ? "◐" : "◑")}
             </button>
-            <Link href="/login" className="tc-nav-login">{lang === "id" ? "Masuk" : "Login"}</Link>
+            <Link href="/login" className="tc-nav-login">{t("auth.login")}</Link>
             <Link href="/register" className="tc-nav-cta">{lang === "id" ? "Buat Akun ↗" : "Register ↗"}</Link>
           </div>
         </div>
@@ -175,13 +175,13 @@ export default function LandingPage() {
           <div className="x-hero-main">
             <div className="tc-hero-eyebrow">
               <span className="tc-dot-pulse" />
-              <span>BLOCKCHAIN PROTOCOL — LIVE ON ETHEREUM</span>
+              <span>{t("landing.hero_eyebrow")}</span>
             </div>
 
             <h1 className="x-hero-title">
-              <span className="tc-reveal x-glitch" data-text="Trust">Trust</span>
+              <span className="tc-reveal x-glitch" data-text={t("landing.hero_title_1")}>{t("landing.hero_title_1")}</span>
               <br />
-              <span className="tc-reveal tc-reveal-delay x-glitch" data-text="Chain_">Chain<span className="tc-cursor">_</span></span>
+              <span className="tc-reveal tc-reveal-delay x-glitch" data-text={t("landing.hero_title_2")}>{t("landing.hero_title_2")}</span>
             </h1>
 
             <div className="x-hero-subtitle-wrap">
@@ -189,16 +189,16 @@ export default function LandingPage() {
                 className="x-hero-subtitle"
                 style={{ transform: `translateY(${scrollY * 0.08}px)`, opacity: Math.max(0, 1 - scrollY * 0.002) }}
               >
-                Infrastruktur verifikasi rantai pasok yang mengubah <em>opacity</em> menjadi <em>transparency</em>.
+                {t("landing.hero_subtitle")}
               </p>
             </div>
 
             <div className="tc-hero-actions">
               <Link href="/register" className="tc-btn-primary">
-                <span>Mulai Sekarang</span>
+                <span>{t("landing.hero_cta_primary")}</span>
                 <span className="tc-btn-arrow">→</span>
               </Link>
-              <Link href="/login" className="tc-btn-outline">Masuk ke Platform</Link>
+              <Link href="/login" className="tc-btn-outline">{t("landing.hero_cta_secondary")}</Link>
             </div>
           </div>
 
@@ -208,12 +208,12 @@ export default function LandingPage() {
             <div className="x-float-card x-float-1">
               <div className="tc-data-card-header">
                 <span className="tc-dot-pulse" />
-                <span className="font-mono" style={{ fontSize: 10, letterSpacing: "0.12em" }}>LIVE NETWORK</span>
+                <span className="font-mono" style={{ fontSize: 10, letterSpacing: "0.12em" }}>{t("landing.live_network")}</span>
               </div>
               {[
-                { l: "Active nodes", v: "847" },
-                { l: "Latest block", v: "#18,945,231" },
-                { l: "24h tx", v: "12,847" },
+                { l: t("landing.active_nodes"), v: "847" },
+                { l: t("landing.latest_block"), v: "#18,945,231" },
+                { l: t("landing.daily_tx"), v: "12,847" },
               ].map((r, i) => (
                 <div key={i} className="tc-data-row">
                   <span className="tc-data-label">{r.l}</span>
@@ -222,12 +222,10 @@ export default function LandingPage() {
               ))}
             </div>
 
-
-
             {/* Card 3: Small floating badge */}
             <div className="x-float-card x-float-3">
               <span className="tc-dot-pulse" />
-              <span className="font-mono" style={{ fontSize: 10 }}>8,412 UMKM verified</span>
+              <span className="font-mono" style={{ fontSize: 10 }}>{t("landing.verified_umkm_badge")}</span>
             </div>
           </div>
 
@@ -245,7 +243,7 @@ export default function LandingPage() {
           <div className="tc-marquee-track">
             {[...Array(4)].map((_, i) => (
               <span key={i} className="tc-marquee-content">
-                BLOCKCHAIN · AI ANALYTICS · SUPPLY CHAIN · SMART CONTRACTS · DIGITAL IDENTITY · TRACEABILITY · FRAUD DETECTION · EXPORT READY ·&nbsp;
+                {t("landing.marquee")}&nbsp;
               </span>
             ))}
           </div>
@@ -258,10 +256,10 @@ export default function LandingPage() {
       ══════════════════════════════════════════════════ */}
       <div className="x-metrics-ribbon">
         {[
-          { img: "/images/home_products/home_product_1.png", label: "Minyak Gosok Premium", width: "78%" },
-          { img: "/images/home_products/home_product_2.png", label: "Kapsul Suplemen", width: "92%" },
-          { img: "/images/home_products/home_product_3.png", label: "Minuman Jamu Ekstrak", width: "99%" },
-          { img: "/images/home_products/home_product_4.png", label: "Salep Kosmetik Herbal", width: "65%" },
+          { img: "/images/home_products/home_product_1.png", label: t("landing.metric_1"), width: "78%" },
+          { img: "/images/home_products/home_product_2.png", label: t("landing.metric_2"), width: "92%" },
+          { img: "/images/home_products/home_product_3.png", label: t("landing.metric_3"), width: "99%" },
+          { img: "/images/home_products/home_product_4.png", label: t("landing.metric_4"), width: "65%" },
         ].map((m, i) => (
           <div key={i} className="x-metric-cell x-product-metric-cell">
             <div className="x-product-metric-img-wrapper">
@@ -284,13 +282,13 @@ export default function LandingPage() {
       <section id="manifesto" className="x-skew-section">
         <div className="x-skew-content">
           <div className="x-manifesto-layout">
-            <div className="x-manifesto-num">01</div>
+            <div className="x-manifesto-num">{t("landing.manifesto_num")}</div>
             <div className="x-manifesto-body">
               <h2 className="x-manifesto-text">
-                Kami membangun TrustChain karena <span className="tc-text-highlight">8.4 juta UMKM Indonesia</span> tidak punya akses ke infrastruktur verifikasi yang layak.
+                {t("landing.manifesto_text_1")}<span className="tc-text-highlight">{t("landing.manifesto_highlight")}</span>{t("landing.manifesto_text_2")}
               </h2>
               <p className="x-manifesto-p2">
-                Rantai pasok yang transparan bukan privilege — itu <em>hak</em>.
+                {t("landing.manifesto_sub")}
               </p>
             </div>
           </div>
@@ -302,10 +300,10 @@ export default function LandingPage() {
           Cards stack with deliberate z-index + offset.
           Not a flat grid — a layered composition.
       ══════════════════════════════════════════════════ */}
-      <section id="protocol" className="tc-section">
+      <section id="protocol" className="tc-section content-auto">
         <div className="tc-section-header">
-          <span className="tc-section-tag">02 — PROTOCOL</span>
-          <h2 className="tc-section-h2">Tiga layer.<br />Satu <span className="tc-text-highlight">kebenaran</span>.</h2>
+          <span className="tc-section-tag">{t("landing.protocol_tag")}</span>
+          <h2 className="tc-section-h2">{t("landing.protocol_title")}<br /><span className="tc-text-highlight">{t("landing.protocol_highlight")}</span></h2>
         </div>
 
         <div className="x-depth-stack">
@@ -318,9 +316,9 @@ export default function LandingPage() {
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
             </div>
-            <h3 className="tc-bento-title">Digital Identity Layer</h3>
-            <p className="tc-bento-desc">Setiap produk UMKM mendapat identitas digital unik yang tercatat di blockchain — immutable dan traceable dari hulu ke hilir.</p>
-            <div className="tc-bento-tag">VERIFICATION · IMMUTABLE</div>
+            <h3 className="tc-bento-title">{t("landing.protocol_l1_title")}</h3>
+            <p className="tc-bento-desc">{t("landing.protocol_l1_desc")}</p>
+            <div className="tc-bento-tag">{t("landing.protocol_l1_tag")}</div>
           </div>
 
           {/* Layer 2: middle */}
@@ -332,9 +330,9 @@ export default function LandingPage() {
                 <rect x="2" y="3" width="20" height="18" rx="2" /><path d="M8 7h8M8 11h5" />
               </svg>
             </div>
-            <h3 className="tc-bento-title">Smart Contract Engine</h3>
-            <p className="tc-bento-desc">Otomasi kontrak antara UMKM, buyer, dan logistik. Kode adalah hukum — tanpa pihak ketiga.</p>
-            <div className="tc-bento-tag">AUTOMATION · TRUSTLESS</div>
+            <h3 className="tc-bento-title">{t("landing.protocol_l2_title")}</h3>
+            <p className="tc-bento-desc">{t("landing.protocol_l2_desc")}</p>
+            <div className="tc-bento-tag">{t("landing.protocol_l2_tag")}</div>
           </div>
 
           {/* Layer 3: front — smallest, most forward */}
@@ -346,9 +344,9 @@ export default function LandingPage() {
                 <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
               </svg>
             </div>
-            <h3 className="tc-bento-title">AI Prediction Core</h3>
-            <p className="tc-bento-desc">Neural network mendeteksi fraud, memprediksi demand, dan mengoptimasi distribusi secara real-time.</p>
-            <div className="tc-bento-tag">INTELLIGENCE · REAL-TIME</div>
+            <h3 className="tc-bento-title">{t("landing.protocol_l3_title")}</h3>
+            <p className="tc-bento-desc">{t("landing.protocol_l3_desc")}</p>
+            <div className="tc-bento-tag">{t("landing.protocol_l3_tag")}</div>
           </div>
         </div>
       </section>
@@ -357,19 +355,19 @@ export default function LandingPage() {
           DATA WALL — Brutalist unequal grid (1fr 2fr 1fr)
           Dense auto-placement creates visual tension.
       ══════════════════════════════════════════════════ */}
-      <section className="tc-section" style={{ padding: "0 32px 140px" }}>
+      <section className="tc-section content-auto" style={{ padding: "0 32px 140px" }}>
         <div className="tc-section-header">
-          <span className="tc-section-tag">05 — DATA WALL</span>
-          <h2 className="tc-section-h2">The network<br /><span className="tc-text-highlight">speaks</span>.</h2>
+          <span className="tc-section-tag">{t("landing.data_wall_tag")}</span>
+          <h2 className="tc-section-h2">{t("landing.data_wall_title")}<br /><span className="tc-text-highlight">{t("landing.data_wall_highlight")}</span></h2>
         </div>
         <div className="x-data-wall" ref={staggerRef}>
           {[
-            { title: "Transparent Blockchain Ledger", desc: "Seluruh riwayat transaksi terekam secara on-chain. Terbuka, immutable, dan siapapun dapat melakukan verifikasi transaksi.", tag: "IMMUTABLE · PUBLIC", num: "01", cls: "" },
-            { title: "QRIS Payment Gateway", desc: "Sistem Top-Up saldo dan simulasi pembayaran real-time menggunakan QRIS. Beli produk UMKM semudah scan barcode.", tag: "INSTANT · SEAMLESS", num: "02", cls: "x-data-wall-wide" },
-            { title: "Verifikasi Dokumen Ekspor", desc: "UMKM mengunggah NIB, Sertifikat Halal, & BPOM untuk diverifikasi Admin. Membuka jalan menuju pasar global.", tag: "COMPLIANCE · GLOBAL", num: "03", cls: "" },
-            { title: "Marketplace B2B Terkurasi", desc: "Portal khusus bagi Buyer untuk menemukan produk UMKM unggulan yang keasliannya terjamin 100% on-chain.", tag: "VERIFIED · SECURE", num: "04", cls: "x-data-wall-tall" },
-            { title: "Role-Based Dashboards", desc: "Tiga jenis portal khusus: Admin (Oversight), UMKM (Seller Center), dan Buyer (Pembelian). Dilengkapi tema gelap/terang.", tag: "PERSONALIZED · UI/UX", num: "05", cls: "" },
-            { title: "Smart Contract Engine", desc: "Pencatatan perpindahan dana dan perubahan stok otomatis tereksekusi tanpa perantara pihak ketiga.", tag: "AUTOMATION · TRUSTLESS", num: "06", cls: "" },
+            { title: t("landing.dw_1_title"), desc: t("landing.dw_1_desc"), tag: t("landing.dw_1_tag"), num: "01", cls: "" },
+            { title: t("landing.dw_2_title"), desc: t("landing.dw_2_desc"), tag: t("landing.dw_2_tag"), num: "02", cls: "x-data-wall-wide" },
+            { title: t("landing.dw_3_title"), desc: t("landing.dw_3_desc"), tag: t("landing.dw_3_tag"), num: "03", cls: "" },
+            { title: t("landing.dw_4_title"), desc: t("landing.dw_4_desc"), tag: t("landing.dw_4_tag"), num: "04", cls: "x-data-wall-tall" },
+            { title: t("landing.dw_5_title"), desc: t("landing.dw_5_desc"), tag: t("landing.dw_5_tag"), num: "05", cls: "" },
+            { title: t("landing.dw_6_title"), desc: t("landing.dw_6_desc"), tag: t("landing.dw_6_tag"), num: "06", cls: "" },
           ].map((item, i) => (
             <div key={i} className={`x-data-wall-cell x-stagger ${item.cls}`}>
               <div>
@@ -390,11 +388,11 @@ export default function LandingPage() {
           Tiny left rail with vertical text.
           Wide right panel with content.
       ══════════════════════════════════════════════════ */}
-      <section id="architecture" className="tc-section" style={{ padding: "0 0 140px" }}>
+      <section id="architecture" className="tc-section content-auto" style={{ padding: "0 0 140px" }}>
         <div className="x-uneven-split">
           {/* 20% rail — vertical text */}
           <div className="x-rail">
-            <span className="x-rail-text">ARCHITECTURE</span>
+            <span className="x-rail-text">{lang === "id" ? "ARSITEKTUR" : "ARCHITECTURE"}</span>
             <div className="x-rail-line" />
             <span className="x-rail-num">03</span>
           </div>
@@ -402,14 +400,18 @@ export default function LandingPage() {
           {/* 80% content */}
           <div className="x-rail-content">
             <h2 className="tc-split-h2" style={{ marginBottom: 64 }}>
-              Dibangun untuk <span className="tc-text-highlight">skala</span>,<br />bukan untuk demo.
+              {lang === "id" ? (
+                <>Dibangun untuk <span className="tc-text-highlight">skala</span>,<br />bukan untuk demo.</>
+              ) : (
+                <>Engineered for <span className="tc-text-highlight">scale</span>,<br />not for demos.</>
+              )}
             </h2>
 
             <div className="x-arch-grid">
               {[
-                { num: "L1", title: "Consensus", desc: "Proof-of-Stake validation dengan finality < 3 detik. 10K+ TPS untuk transaksi mikro.", tag: "LAYER 1" },
-                { num: "L2", title: "Intelligence", desc: "Neural network untuk fraud detection dan demand prediction. Data BPS + Kemendag.", tag: "LAYER 2" },
-                { num: "L3", title: "Interface", desc: "Dashboard stakeholder: UMKM, buyer, pemerintah, bank. Mobile-first dan real-time.", tag: "LAYER 3" },
+                { num: "L1", title: "Consensus", desc: lang === "id" ? "Proof-of-Stake validation dengan finality < 3 detik. 10K+ TPS untuk transaksi mikro." : "Proof-of-Stake validation with <3s finality. 10K+ TPS for high-frequency micro-transactions.", tag: "LAYER 1" },
+                { num: "L2", title: "Intelligence", desc: lang === "id" ? "Neural network untuk deteksi fraud dan prediksi permintaan pasar. Integrasi data BPS + Kemendag." : "Neural network for fraud detection and market demand forecasting. Integrated with national trade data.", tag: "LAYER 2" },
+                { num: "L3", title: "Interface", desc: lang === "id" ? "Dashboard stakeholder terpadu: UMKM, buyer, dan auditor. Responsif dan update real-time." : "Unified stakeholder dashboards: MSMEs, buyers, and auditors. Fully responsive with real-time sync.", tag: "LAYER 3" },
               ].map((item, i) => (
                 <div key={i} className="x-arch-card tc-card-clip">
                   <div className="tc-bento-corner" />
@@ -430,7 +432,7 @@ export default function LandingPage() {
           TESTIMONIAL — 30/70 Asymmetric Split
           Quote element overlaps the gutter boundary.
       ══════════════════════════════════════════════════ */}
-      <div className="x-testimonial-split">
+      <div className="x-testimonial-split content-auto">
         <div className="x-testimonial-rail">
           <span className="x-testimonial-mark">&ldquo;</span>
         </div>
@@ -440,7 +442,9 @@ export default function LandingPage() {
             <span className="x-testimonial-overflow-sub">Trust Score</span>
           </div>
           <p className="x-testimonial-quote">
-            TrustChain mengubah cara kami memverifikasi supplier. Dari proses <em>berminggu-minggu</em> menjadi <em>hitungan detik</em>. Ini bukan sekadar tools — ini infrastruktur kepercayaan baru.
+            {lang === "id" 
+              ? "TrustChain mengubah cara kami memverifikasi supplier. Dari proses berminggu-minggu menjadi hitungan detik. Ini bukan sekadar tools — ini infrastruktur kepercayaan baru."
+              : "TrustChain transformed how we verify suppliers. From a multi-week ordeal into mere seconds. This isn't just a tool — it's the new standard of cryptographic trust."}
           </p>
           <div className="x-testimonial-author">
             <div className="x-testimonial-avatar">RA</div>
@@ -456,17 +460,23 @@ export default function LandingPage() {
           SECTION 5: ROLES — Typography-driven
           Role name IS the visual. Giant text with description overlay.
       ══════════════════════════════════════════════════ */}
-      <section className="tc-section">
+      <section className="tc-section content-auto">
         <div className="tc-section-header">
           <span className="tc-section-tag">04 — ACCESS</span>
-          <h2 className="tc-section-h2">Satu ekosistem.<br />Tiga <span className="tc-text-highlight">portal</span>.</h2>
+          <h2 className="tc-section-h2">
+            {lang === "id" ? (
+              <>Satu ekosistem.<br />Tiga <span className="tc-text-highlight">portal</span>.</>
+            ) : (
+              <>One ecosystem.<br />Three <span className="tc-text-highlight">portals</span>.</>
+            )}
+          </h2>
         </div>
 
         <div className="x-typo-roles">
           {[
-            { role: "Admin", desc: "Oversight penuh pada sistem. Verifikasi dokumen UMKM, kelola produk, dan pantau Transparent Ledger.", href: "/login", num: "01" },
-            { role: "UMKM", desc: "Daftarkan produk unggulan, unggah sertifikasi ekspor, dan pantau pesanan dari Buyer.", href: "/login", num: "02" },
-            { role: "Buyer", desc: "Telusuri marketplace B2B, Top-Up saldo, dan lakukan pembelian instan via QRIS Payment Gateway.", href: "/login", num: "03" },
+            { role: "Admin", desc: lang === "id" ? "Oversight penuh pada sistem. Verifikasi dokumen UMKM, kelola produk, dan pantau Transparent Ledger." : "Complete system oversight. Verify MSME documentation, manage products, and monitor the Transparent Ledger.", href: "/login", num: "01" },
+            { role: "UMKM", desc: lang === "id" ? "Daftarkan produk unggulan, unggah sertifikasi ekspor, dan pantau pesanan dari Buyer." : "Register flagship products, upload export certifications, and fulfill orders from buyers.", href: "/login", num: "02" },
+            { role: "Buyer", desc: lang === "id" ? "Telusuri marketplace B2B, Top-Up saldo, dan lakukan pembelian instan via QRIS Payment Gateway." : "Explore curated B2B marketplace, top up balance, and buy directly via instant QRIS payment.", href: "/login", num: "03" },
           ].map((r) => (
             <Link key={r.role} href={r.href} className="x-typo-role">
               <span className="x-typo-role-num">{r.num}</span>
@@ -481,20 +491,28 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════════════════
           SECTION 6: CTA — Full bleed typographic
       ══════════════════════════════════════════════════ */}
-      <section className="tc-cta">
+      <section className="tc-cta content-auto">
         <div className="tc-cta-inner">
           <h2 className="tc-cta-h2">
-            Mulai<br />sekarang<span className="tc-cursor">_</span>
+            {lang === "id" ? (
+              <>Mulai<br />sekarang</>
+            ) : (
+              <>Get started<br />today</>
+            )}
           </h2>
           <p className="tc-cta-sub">
-            Tidak perlu kartu kredit. Tidak perlu setup rumit.<br />Daftarkan bisnis Anda dalam 2 menit.
+            {lang === "id" ? (
+              <>Tidak perlu kartu kredit. Tidak perlu setup rumit.<br />Daftarkan bisnis Anda dalam 2 menit.</>
+            ) : (
+              <>No credit card required. No complex configuration.<br />Register your enterprise in under 2 minutes.</>
+            )}
           </p>
           <div className="tc-cta-btns">
             <Link href="/register" className="tc-btn-primary tc-btn-large">
-              <span>Buat Akun</span>
+              <span>{t("auth.register")}</span>
               <span className="tc-btn-arrow">→</span>
             </Link>
-            <Link href="/login" className="tc-btn-outline">Masuk ke dashboard</Link>
+            <Link href="/login" className="tc-btn-outline">{t("auth.login")}</Link>
           </div>
         </div>
       </section>
@@ -507,10 +525,10 @@ export default function LandingPage() {
             <span className="tc-footer-copy">© {new Date().getFullYear()}</span>
           </div>
           <div className="tc-footer-links">
-            <a href="#">Protocol</a>
-            <a href="#">Docs</a>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
+            <a href="#protocol">Protocol</a>
+            <a href="https://insw.go.id/" target="_blank" rel="noopener noreferrer">INSW</a>
+            <a href="https://www.beacukai.go.id/" target="_blank" rel="noopener noreferrer">Customs</a>
+            <Link href="/marketplace">Marketplace</Link>
           </div>
         </div>
       </footer>

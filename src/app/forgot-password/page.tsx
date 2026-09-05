@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Mail, ArrowLeft, Loader2, CheckCircle, Copy } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Mail, ArrowLeft, Loader2, CheckCircle, Copy, Globe } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const { theme } = useTheme();
+  const { lang, setLang } = useLanguage();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -26,7 +28,7 @@ export default function ForgotPasswordPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Gagal mengirim permintaan");
+        setError(data.error || (lang === "id" ? "Gagal mengirim permintaan" : "Failed to send request"));
         return;
       }
       setSent(true);
@@ -34,7 +36,7 @@ export default function ForgotPasswordPage() {
         setResetUrl(data._demo_reset_url);
       }
     } catch {
-      setError("Gagal terhubung ke server");
+      setError(lang === "id" ? "Gagal terhubung ke server" : "Failed to connect to server");
     } finally {
       setLoading(false);
     }
@@ -50,8 +52,20 @@ export default function ForgotPasswordPage() {
   return (
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-      background: bg, fontFamily: "'Inter', sans-serif", padding: 24,
+      background: bg, fontFamily: "'Inter', sans-serif", padding: 24, position: "relative"
     }}>
+      <div style={{ position: "absolute", top: 20, right: 24 }}>
+        <button
+          onClick={() => setLang(lang === "id" ? "en" : "id")}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 12px",
+            borderRadius: 8, background: isDark ? "#111" : "#eee", border: `1px solid ${borderColor}`,
+            color: textPrimary, cursor: "pointer", fontSize: 12, fontWeight: 600
+          }}
+        >
+          <Globe size={14} /> {lang === "id" ? "EN" : "ID"}
+        </button>
+      </div>
       <div style={{
         width: "100%", maxWidth: 420, background: cardBg,
         border: `1px solid ${borderColor}`, borderRadius: 16, padding: 40,
@@ -60,14 +74,16 @@ export default function ForgotPasswordPage() {
           display: "inline-flex", alignItems: "center", gap: 6,
           color: textSecondary, textDecoration: "none", fontSize: 13, marginBottom: 24,
         }}>
-          <ArrowLeft size={14} /> Kembali ke Login
+          <ArrowLeft size={14} /> {lang === "id" ? "Kembali ke Login" : "Back to Login"}
         </Link>
 
         <h1 style={{ fontSize: 24, fontWeight: 800, color: textPrimary, marginBottom: 8 }}>
-          Lupa Password
+          {lang === "id" ? "Lupa Password" : "Forgot Password"}
         </h1>
         <p style={{ fontSize: 14, color: textSecondary, marginBottom: 28, lineHeight: 1.6 }}>
-          Masukkan email Anda dan kami akan mengirimkan link untuk mereset password.
+          {lang === "id"
+            ? "Masukkan email Anda dan kami akan mengirimkan link untuk mereset password."
+            : "Enter your registered email and we will send you a password reset link."}
         </p>
 
         {!sent ? (
@@ -112,17 +128,19 @@ export default function ForgotPasswordPage() {
               }}
             >
               {loading && <Loader2 size={16} className="tc-spin-icon" />}
-              {loading ? "Mengirim..." : "Kirim Link Reset"}
+              {loading ? (lang === "id" ? "Mengirim..." : "Sending...") : (lang === "id" ? "Kirim Link Reset" : "Send Reset Link")}
             </button>
           </form>
         ) : (
           <div style={{ textAlign: "center" }}>
             <CheckCircle size={48} color={textPrimary} style={{ marginBottom: 16 }} />
             <h2 style={{ fontSize: 18, fontWeight: 700, color: textPrimary, marginBottom: 8 }}>
-              Email Terkirim
+              {lang === "id" ? "Email Terkirim" : "Email Sent"}
             </h2>
             <p style={{ fontSize: 13, color: textSecondary, marginBottom: 24, lineHeight: 1.6 }}>
-              Jika email terdaftar, Anda akan menerima link reset password.
+              {lang === "id"
+                ? "Jika email terdaftar, Anda akan menerima link reset password."
+                : "If this email is registered, you will receive a password reset link shortly."}
             </p>
             {resetUrl && (
               <div style={{
@@ -156,7 +174,7 @@ export default function ForgotPasswordPage() {
               background: textPrimary, color: isDark ? "#000" : "#fff",
               textDecoration: "none", fontSize: 14, fontWeight: 600,
             }}>
-              Kembali ke Login
+              {lang === "id" ? "Kembali ke Login" : "Back to Login"}
             </Link>
           </div>
         )}

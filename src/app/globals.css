@@ -3,8 +3,13 @@
 /* ============================================================
    DESIGN TOKENS — DARK THEME (default) — BLACK & WHITE ELEGANT
    ============================================================ */
+:root {
+  color-scheme: light dark;
+}
+
 :root,
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg-primary: #000000;
   --bg-secondary: #0a0a0a;
   --bg-tertiary: #141414;
@@ -50,6 +55,7 @@
    LIGHT THEME — CLEAN WHITE & DARK
    ============================================================ */
 [data-theme="light"] {
+  color-scheme: light;
   --bg-primary: #fafafa;
   --bg-secondary: #ffffff;
   --bg-tertiary: #f0f0f0;
@@ -3837,3 +3843,23 @@ body {
     min-width: 600px;
   }
 }
+
+/* ============================================================
+   MODERN WEB GUIDANCE: PERFORMANCE & ACCESSIBILITY
+   ============================================================ */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 400px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

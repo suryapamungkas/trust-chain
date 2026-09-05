@@ -17,9 +17,11 @@ except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'openpyxl', '-q'])
     import openpyxl
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'trustchain.db')
-EXCEL_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
-    'Dataset Usaha Mikro Kecil dan Menengah (UMKM) Obat Tradisionals 2026-05-26.xlsx')
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(ROOT_DIR, 'trustchain.db')
+excel_candidate_1 = os.path.join(ROOT_DIR, 'data', 'Dataset Usaha Mikro Kecil dan Menengah (UMKM) Obat Tradisionals 2026-05-26.xlsx')
+excel_candidate_2 = os.path.join(os.path.dirname(ROOT_DIR), 'Dataset Usaha Mikro Kecil dan Menengah (UMKM) Obat Tradisionals 2026-05-26.xlsx')
+EXCEL_PATH = excel_candidate_1 if os.path.exists(excel_candidate_1) else excel_candidate_2
 
 random.seed(42)  # Reproducible results
 
